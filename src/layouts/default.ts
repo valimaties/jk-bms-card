@@ -338,8 +338,8 @@ export class JkBmsDefaultLayout extends LitElement {
         this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
         this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
 
-        if (!this.minCellId || !this.maxCellId || !this.maxDeltaV || this.maxDeltaV == 0 || true) {
-            this.calculateDynamicMinMaxCellId(totalCells)
+        if (!this.minCellId || !this.maxCellId || !this.maxDeltaV || this.maxDeltaV == 0) {
+            this.calculateDynamicMinMaxCellId(totalCells);
         }
 
         for (let i = start; i <= end; i++) {
