@@ -22,6 +22,7 @@ export class JkBmsDefaultLayout extends LitElement {
             display: grid;
             gap: 4px;
             margin: 4px;
+            align-content: center;
         }
 
         .grid-1 {
@@ -142,6 +143,7 @@ export class JkBmsDefaultLayout extends LitElement {
 
         .center {
             text-align: center;
+            align-content: center;
         }
 
         .pill {
@@ -280,11 +282,11 @@ export class JkBmsDefaultLayout extends LitElement {
           </div>
         </div>
 
-          <svg class="flow-line" id="flow-svg">
-              <path id="flow-path" fill="none" />
-          </svg>
+        <svg class="flow-line" id="flow-svg">
+            <path id="flow-path" fill="none" />
+        </svg>
 
-          <div class="grid grid-${this.config.cellColumns ?? 2}">
+        <div class="grid grid-${this.config.cellColumns ?? 2}">
           ${this._renderCells(this.config.cellLayout == "bankMode")}
         </div>
       </ha-card>
@@ -436,10 +438,11 @@ export class JkBmsDefaultLayout extends LitElement {
         const maxRect = maxEl.getBoundingClientRect();
 
         const getSideAnchor = (rect: DOMRect): { side: 'left' | 'right', x: number, y: number } => {
+            const columns = this.config?.cellColumns ?? 2;
             const centerX = rect.left + rect.width / 2;
             const midCardX = cardRect.left + cardRect.width / 2;
-            const side = centerX < midCardX ? 'right' : 'left';
-            const x = side === 'right' ? rect.right - cardRect.left : rect.left - cardRect.left;
+            const side = columns === 1 ? 'left' : (centerX < midCardX ? 'right' : 'left');
+            const x = columns === 1 ? cardRect.width / 2 - 80 : (side === 'right' ? rect.right - cardRect.left : rect.left - cardRect.left);
             const y = rect.top + rect.height / 2 - cardRect.top;
             return { side, x, y };
         };
