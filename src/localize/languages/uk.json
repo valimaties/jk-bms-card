@@ -40,6 +40,8 @@
     "cycles": "Цикли:",
     "delta": "Дельта напруги:",
     "mosfetTemp": "Температура MOS:",
+    "minCellV": "Мін. (B):",
+    "maxCellV": "Макс. (B):",
     "temperature_sensor_1": "Темп. 1:",
     "temperature_sensor_2": "Темп. 2:",
     "temperature_sensor_3": "Темп. 3:",

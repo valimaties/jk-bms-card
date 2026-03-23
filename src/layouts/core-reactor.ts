@@ -709,7 +709,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
                     <!-- Reactor (SOC) -->
                     <div class="reactor-container">
-                        <div class="reactor-ring ${isBalancing ? "reactor-ring-balancing" : "reactor-ring-base"} clickable" 
+                        <div class="reactor-ring ${(isBalancing && balancingCurrent != 0) ? "reactor-ring-balancing" : "reactor-ring-base"} clickable" 
                              @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>
                             <div class="soc-label">SoC:</div>
                             <div class="soc-value">${soc}%</div>

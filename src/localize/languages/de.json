@@ -40,6 +40,8 @@
     "cycles": "Zyklen:",
     "delta": "Spannungsdiff.:",
     "mosfetTemp": "MOS Temp:",
+    "minCellV": "Min Zell. V:",
+    "maxCellV": "Max Zell. V:",
     "temperature_sensor_1": "Temp. 1:",
     "temperature_sensor_2": "Temp. 2:",
     "temperature_sensor_3": "Temp. 3:",

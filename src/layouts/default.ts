@@ -232,8 +232,16 @@ export class JkBmsDefaultLayout extends LitElement {
         const balanceCurrent = parseFloat(this.getState(EntityKey.balancing_current, 2, '0'));
         const powerNumber = parseFloat(this.getState(EntityKey.power, 2, '0'));
         const triggerV = Number(this.getState(EntityKey.balance_trigger_voltage, 2, "", "number"));
+        const balance_starting_voltage = Number(this.getState(EntityKey.balance_starting_voltage, 3, "", "number"));
+        const min_cell_voltage = Number(this.getState(EntityKey.max_cell_voltage, 3, "", "number"));
+        const max_cell_voltage = Number(this.getState(EntityKey.max_cell_voltage, 3, "", "number"));
+        const balanceOnOff = this.getState(EntityKey.balancer, 0, '', 'switch');
 
-        this.shouldBalance = this.maxDeltaV >= triggerV;
+        // If balancer is ON the balancing will be triggered only if some conditions are met:
+        // - balance trigger voltage is reached (delta voltage is greater than or equal to balance trigger voltage)
+        // - max voltage cell is greater or equal to balance starting voltage set in JK BMS.
+        // If these conditions are not met then no balance current is applied.
+        this.shouldBalance = this.maxDeltaV >= triggerV && max_cell_voltage >= balance_starting_voltage && balanceOnOff == 'on';
 
         const powerClass = powerNumber > 0 ? 'power-positive' : powerNumber < 0 ? 'power-negative' : 'power-even'
         const balanceClass = balanceCurrent > 0 ? 'balance-positive' : balanceCurrent < 0 ? 'balance-negative' : 'balance-even';
@@ -271,6 +279,7 @@ export class JkBmsDefaultLayout extends LitElement {
               ${localize('stats.capacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_battery_capacity_setting)}>${this.getState(EntityKey.total_battery_capacity_setting, customDecimals)} Ah</span><br>
               ${localize('stats.cycleCapacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_charging_cycle_capacity)}>${this.getState(EntityKey.total_charging_cycle_capacity, customDecimals)} Ah</span><br>
               ${localize('stats.averageCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.average_cell_voltage)}>${this.getState(EntityKey.average_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
+              ${localize('stats.minCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.min_cell_voltage)}>${this.getState(EntityKey.min_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
               ${localize('stats.balanceCurrent')} <span class="${balanceClass}">${balanceCurrent.toFixed(1)} A</span>
               ${this._renderTemps(1)}
           </div>
@@ -283,16 +292,18 @@ export class JkBmsDefaultLayout extends LitElement {
               ${localize('stats.remainingAmps')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>${this.getState(EntityKey.capacity_remaining, customDecimals)} Ah</span><br>
               ${localize('stats.cycles')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.charging_cycles)}>${this.getState(EntityKey.charging_cycles, customDecimals)}</span><br>
               ${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.maxDeltaV)} </span><br>
+              ${localize('stats.maxCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.max_cell_voltage)}>${this.getState(EntityKey.max_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
               ${localize('stats.mosfetTemp')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${this.getState(EntityKey.power_tube_temperature)} °C</span>
               ${this._renderTemps(2)}
           </div>
         </div>
+        
+        ${this.shouldBalance ? html`
+        <svg class="flow-line" id="flow-svg">
+            <path id="flow-path" fill="none" />
+        </svg>` : ''}
 
-          <svg class="flow-line" id="flow-svg">
-              <path id="flow-path" fill="none" />
-          </svg>
-
-          <div class="grid grid-${this.config.cellColumns ?? 2}">
+        <div class="grid grid-${this.config.cellColumns ?? 2}">
           ${this._renderCells(this.config.cellLayout == "bankMode")}
         </div>
       </ha-card>
