@@ -31,11 +31,15 @@ export function localize(string: string, search = '', replace = '') {
       .replace(/['"]+/g, '')
       .replace('-', '_');
 
-    const lang = forcedLang ||
-                 globalData.hass?.selectedLanguage ||
-                 globalData.hass?.locale?.language ||
-                 globalData.hass?.language ||
-                 langFromLocalStorage;
+    const hassLang =
+      globalData.hass?.selectedLanguage ||
+      globalData.hass?.locale?.language ||
+      globalData.hass?.language;
+
+    const lang =
+      forcedLang && forcedLang !== 'auto'
+        ? forcedLang
+        : hassLang || langFromLocalStorage;
 
     let translated: string;
 
