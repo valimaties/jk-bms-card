@@ -713,7 +713,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                              @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>
                             <div class="soc-label">SoC:</div>
                             <div class="soc-value">${soc}%</div>
-                            ${isBalancing ? 
+                            ${isBalancing && balancingCurrent != 0 ? 
                                     html`<div class="capacity-val capacity-val-balancing clickable"
                                             @click=${(e) => this._navigate(e, EntityKey.balancing_current)}>
                                                 ${localize('html_texts.balancing')}:<br>${this.getState(EntityKey.balancing_current)} A</div>` : 

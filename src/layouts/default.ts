@@ -239,11 +239,7 @@ export class JkBmsDefaultLayout extends LitElement {
         const max_cell_voltage = Number(this.getState(EntityKey.max_cell_voltage, 3, "", "number"));
         const balanceOnOff = this.getState(EntityKey.balancer, 0, '', 'switch');
 
-        // If balancer is ON the balancing will be triggered only if some conditions are met:
-        // - balance trigger voltage is reached (delta voltage is greater than or equal to balance trigger voltage)
-        // - max voltage cell is greater or equal to balance starting voltage set in JK BMS.
-        // If these conditions are not met then no balance current is applied.
-        this.shouldBalance = this.maxDeltaV >= triggerV && max_cell_voltage >= balance_starting_voltage && balanceOnOff == 'on';
+        this.shouldBalance = balanceCurrent != 0; // this is enough
 
         const powerClass = powerNumber > 0 ? 'power-positive' : powerNumber < 0 ? 'power-negative' : 'power-even'
         const balanceClass = balanceCurrent > 0 ? 'balance-positive' : balanceCurrent < 0 ? 'balance-negative' : 'balance-even';
