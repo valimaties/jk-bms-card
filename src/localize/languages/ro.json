@@ -19,7 +19,9 @@
     "maxCellVoltage": "Tensiune maximă celulă (V)",
     "manualAssignment": "Atribuire manuală entități",
     "tempSensorsCount": "Număr senzori temperatură disponibili",
-    "hasHeater": "Opțiunea încălzitor este utilizată"
+    "hasHeater": "Opțiunea încălzitor este utilizată",
+    "socDecimals": "Zecimale SoC",
+    "customDecimals": "Zecimale alte controale"
   },
   "switches": {
     "charge": "Încărcare",
@@ -38,6 +40,8 @@
     "cycles": "Cicluri:",
     "delta": "Diferență tensiune:",
     "mosfetTemp": "Temp. MOSFET:",
+    "minCellV": "Tens. Min:",
+    "maxCellV": "Tens. Max:",
     "temperature_sensor_1": "Temp. 1:",
     "temperature_sensor_2": "Temp. 2:",
     "temperature_sensor_3": "Temp. 3:",

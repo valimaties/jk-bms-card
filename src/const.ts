@@ -7,6 +7,7 @@ export enum EntityKey {
     balancing_current ='balancing_current',
     power ='power',
     balance_trigger_voltage ='balance_trigger_voltage',
+    balance_starting_voltage ='balance_starting_voltage',
     total_runtime_formatted ='total_runtime_formatted',
     charging ='charging',
     charging_power ='charging_power',
@@ -26,6 +27,8 @@ export enum EntityKey {
 
     min_voltage_cell ='min_voltage_cell',
     max_voltage_cell ='max_voltage_cell',
+    min_cell_voltage = 'min_cell_voltage',
+    max_cell_voltage = 'max_cell_voltage',
     errors ='errors',
     software_version ='software_version',
     hardware_version ='hardware_version',

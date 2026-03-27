@@ -38,7 +38,6 @@ export class JkBmsCoreReactorLayout extends LitElement {
             color: var(--primary-text-color);
             padding: 8px;
             box-sizing: border-box;
-            background: var(--ha-card-background, var(--card-background-color, #1c1c1c));
             border-radius: var(--ha-card-border-radius, 12px);
         }
 
@@ -640,16 +639,23 @@ export class JkBmsCoreReactorLayout extends LitElement {
         globalData.hass = this.hass;
         if (!this.hass || !this.config) return html``;
 
+        const socDecimals = this.config.socDecimals ?? 0;
+        const soc = this.getState(EntityKey.state_of_charge, socDecimals);
+        const customDecimals = this.config.customDecimals ?? 0;
+
         const hardwareVersion = this.getState(EntityKey.hardware_version);
         const softwareVersion = this.getState(EntityKey.software_version);
-        const title = this.config.title || html`Bat 1 - ${localize('html_texts.capacity')}: <b> ${this.getState(EntityKey.total_battery_capacity_setting)} Ah</b></br>
+        const capacityVal = this.getState(EntityKey.total_battery_capacity_setting, customDecimals);
+        const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
+                        html`Bat 1 - ${localize('html_texts.capacity')}: <b> ${capacityVal} Ah</b></br>
         HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b>`;
 
+        
         const runtime = this.getState(EntityKey.total_runtime_formatted);
         const header = runtime && runtime != "unknown" ? html`${localize('html_texts.time')}: <b>${runtime.toUpperCase()}</b>` : '';
         const current = parseFloat(this.getState(EntityKey.current));
-        const charging_power = this.getState(EntityKey.charging_power);
-        const discharging_power = this.getState(EntityKey.discharging_power);
+        const charging_power = this.getState(EntityKey.charging_power, customDecimals);
+        const discharging_power = this.getState(EntityKey.discharging_power, customDecimals);
 
         // Flow Logic: 
         // Charge (Grid -> SOC) when current > 0
@@ -663,11 +669,9 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const balancingCurrent = parseFloat(this.getState(EntityKey.balancing_current));
 
         // Stats
-        const soc = this.getState(EntityKey.state_of_charge);
-        const capacityVal = this.getState(EntityKey.total_battery_capacity_setting);
         const totalVolts = this.getState(EntityKey.total_voltage);
         const mosTemp = this.getState(EntityKey.power_tube_temperature);
-        const totalChargingCycleCapacity = this.getState(EntityKey.total_charging_cycle_capacity);
+        const totalChargingCycleCapacity = this.getState(EntityKey.total_charging_cycle_capacity, customDecimals);
         const chargingCycles = parseFloat(this.getState(EntityKey.charging_cycles)).toFixed(0).toString();
 
         this.tempSensorsCount = this.config.tempSensorsCount;
@@ -704,17 +708,17 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
                     <!-- Reactor (SOC) -->
                     <div class="reactor-container">
-                        <div class="reactor-ring ${isBalancing ? "reactor-ring-balancing" : "reactor-ring-base"} clickable" 
+                        <div class="reactor-ring ${(isBalancing && balancingCurrent != 0) ? "reactor-ring-balancing" : "reactor-ring-base"} clickable" 
                              @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>
                             <div class="soc-label">SoC:</div>
                             <div class="soc-value">${soc}%</div>
-                            ${isBalancing ? 
+                            ${isBalancing && balancingCurrent != 0 ? 
                                     html`<div class="capacity-val capacity-val-balancing clickable"
                                             @click=${(e) => this._navigate(e, EntityKey.balancing_current)}>
                                                 ${localize('html_texts.balancing')}:<br>${this.getState(EntityKey.balancing_current)} A</div>` : 
                                     html`<div class="capacity-val capacity-val-base clickable"
                                             @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>
-                                                ${localize('html_texts.remaining')}:<br>${this.getState(EntityKey.capacity_remaining)} Ah</div>`
+                                                ${localize('html_texts.remaining')}:<br>${this.getState(EntityKey.capacity_remaining, customDecimals)} Ah</div>`
                                 }
                         </div>
                     </div>
@@ -739,7 +743,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                     </div>
 
                     <!-- SVG Flow Lines -->
-                    <svg class="flow-svg" viewBox="0 0 400 180" preserveAspectRatio="meet">
+                    <svg class="flow-svg" viewBox="0 0 400 180" preserveAspectRatio="xMidYMid meet">
                         <!-- Left path (Charge) - Rough coordinates for now, will refine -->
                         <path d="M 60,70 Q 120,70 125,90" class="${isChargingFlow ? 'path-charge' : 'path-inactive'}"/>
                         <!-- Right path (Discharge) -->

@@ -19,7 +19,9 @@
     "maxCellVoltage": "Max. Zellspannung (V)",
     "manualAssignment": "Manuelle Entitäten-Zuweisung",
     "tempSensorsCount": "Anzahl verfügbarer Temperatursensoren",
-    "hasHeater": "Heizungs-Option wird verwendet"
+    "hasHeater": "Heizungs-Option wird verwendet",
+    "socDecimals": "SOC Dezimalstellen",
+    "customDecimals": "Benutzerdefinierte Dezimalzahlen"
   },
   "switches": {
     "charge": "Laden",
@@ -38,6 +40,8 @@
     "cycles": "Zyklen:",
     "delta": "Spannungsdiff.:",
     "mosfetTemp": "MOS Temp:",
+    "minCellV": "Min Zell. V:",
+    "maxCellV": "Max Zell. V:",
     "temperature_sensor_1": "Temp. 1:",
     "temperature_sensor_2": "Temp. 2:",
     "temperature_sensor_3": "Temp. 3:",

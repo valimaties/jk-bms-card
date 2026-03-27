@@ -46,27 +46,27 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                     title: localize('config.language'),
                     schema: [
                         {
-                        type: 'grid',
-                        schema: [
-                            {
-                            name: 'language',
-                            selector: {
-                                select: {
-                                options: [
-                                    { label: 'Auto (follow HA)', value: '' },
-                                    { label: 'English',          value: 'en' },
-                                    { label: 'Română',           value: 'ro' },
-                                    { label: 'Українська',       value: 'uk' },
-                                    { label: 'German',           value: 'de' },
-                                ],
-                                mode: 'dropdown',
+                            type: 'grid',
+                            schema: [
+                                {
+                                name: 'language',
+                                selector: {
+                                    select: {
+                                    options: [
+                                        { label: 'Auto (follow HA)', value: 'auto' },
+                                        { label: 'English',          value: 'en' },
+                                        { label: 'Română',           value: 'ro' },
+                                        { label: 'Українська',       value: 'uk' },
+                                        { label: 'German',           value: 'de' },
+                                    ],
+                                    mode: 'dropdown',
+                                    }
                                 }
-                            }
-                            },
-                        ],
+                                },
+                            ],
                         },
                     ],
-                    },
+                },
                 {
                     type: 'grid',
                     title: localize('config.prefix'),
@@ -151,18 +151,28 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                             type: 'grid',
                             schema: [
                                 { name: 'cellCount', selector: { number: { min: 2, max: 48, step: 2 } } },
-                                { name: 'cellColumns', selector: { number: { min: 1, max: 8, step: 1 } } },
-                                {
-                                    name: 'cellLayout', selector: {
-                                        select: {
-                                            options: [
-                                                { label: 'Incremental', value: 'incremental' },
-                                                { label: 'Bank Mode', value: 'bankMode' },
-                                            ]
-                                        }
-                                    }
-                                },
-                            ],
+                                { name: 'cellColumns', selector: { number: { min: 1, max: 8, step: 1 } } }
+                            ]
+                        },
+                    ],
+                },
+                {
+                    type: 'grid',
+                    schema: [
+                        {
+                            name: 'cellLayout', selector: {
+                                select: {
+                                    options: [
+                                        { label: 'Incremental', value: 'incremental' },
+                                        { label: 'Bank Mode', value: 'bankMode' },
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            name: 'socDecimals', 
+                            title: localize('config.socDecimals'), 
+                            selector: { number: { min: 0, max: 2, step: 1 } }
                         },
                     ],
                 },
@@ -174,6 +184,11 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                             type: 'grid',
                             schema: [
                                 { name: 'tempSensorsCount', selector: { number: { min: 0, max: 4, step: 2 } } },
+                                {
+                                    name: 'customDecimals', 
+                                    title: localize('config.customDecimals'),
+                                    selector: { number: { min: 0, max: 2, step: 1 } }
+                                },
                             ],
                         },
                     ],

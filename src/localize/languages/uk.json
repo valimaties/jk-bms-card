@@ -19,7 +19,9 @@
     "maxCellVoltage": "Макс. напруга комірки (В)",
     "manualAssignment": "Ручне призначення сутності",
     "tempSensorsCount": "Кількість доступних датчиків температури",
-    "hasHeater": "Використовується опція підігріву"
+    "hasHeater": "Використовується опція підігріву",
+    "socDecimals": "знаки від коми",
+    "customDecimals": "Власні десяткові дроби"
   },
   "switches": {
     "charge": "Заряд",
@@ -38,6 +40,8 @@
     "cycles": "Цикли:",
     "delta": "Дельта напруги:",
     "mosfetTemp": "Температура MOS:",
+    "minCellV": "Мін. (B):",
+    "maxCellV": "Макс. (B):",
     "temperature_sensor_1": "Темп. 1:",
     "temperature_sensor_2": "Темп. 2:",
     "temperature_sensor_3": "Темп. 3:",

@@ -19,7 +19,9 @@
     "maxCellVoltage": "Max Cell Voltage (V)",
     "manualAssignment": "Manual entity assignment",
     "tempSensorsCount": "Number of temperature sensors available",
-    "hasHeater": "Heater option is used"
+    "hasHeater": "Heater option is used",
+    "socDecimals": "SoC Decimals",
+    "customDecimals": "Custom Decimals"
   },
   "switches": {
     "charge": "Charge",
@@ -38,6 +40,8 @@
     "cycles": "Cycles:",
     "delta": "Delta Voltage:",
     "mosfetTemp": "MOS Temp:",
+    "minCellV": "Min Cell V:",
+    "maxCellV": "Max Cell V:",
     "temperature_sensor_1": "Temp. 1:",
     "temperature_sensor_2": "Temp. 2:",
     "temperature_sensor_3": "Temp. 3:",

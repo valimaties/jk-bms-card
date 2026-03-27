@@ -1,6 +1,6 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { HomeAssistant } from 'custom-card-helpers';
+import { HomeAssistant, NumberFormat } from 'custom-card-helpers';
 import { EntityKey } from '../const';
 import { JkBmsCardConfig } from '../interfaces';
 import { localize } from '../localize/localize';
@@ -22,6 +22,7 @@ export class JkBmsDefaultLayout extends LitElement {
             display: grid;
             gap: 4px;
             margin: 4px;
+            align-content: center;
         }
 
         .grid-1 {
@@ -142,6 +143,7 @@ export class JkBmsDefaultLayout extends LitElement {
 
         .center {
             text-align: center;
+            align-content: center;
         }
 
         .pill {
@@ -221,14 +223,23 @@ export class JkBmsDefaultLayout extends LitElement {
     protected render() {
         globalData.hass = this.hass;
         if (!this.hass || !this.config) return html``;
-        const title = this.config.title || 'Bat 1';
+
+        const hardwareVersion = this.getState(EntityKey.hardware_version);
+        const softwareVersion = this.getState(EntityKey.software_version);
+        const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
+            html`Bat 1 - ${localize('html_texts.capacity')}: <b> ${this.getState(EntityKey.total_battery_capacity_setting)} Ah</b></br>
+                HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b>`;
 
         this.maxDeltaV = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));
         const balanceCurrent = parseFloat(this.getState(EntityKey.balancing_current, 2, '0'));
         const powerNumber = parseFloat(this.getState(EntityKey.power, 2, '0'));
         const triggerV = Number(this.getState(EntityKey.balance_trigger_voltage, 2, "", "number"));
+        const balance_starting_voltage = Number(this.getState(EntityKey.balance_starting_voltage, 3, "", "number"));
+        const min_cell_voltage = Number(this.getState(EntityKey.max_cell_voltage, 3, "", "number"));
+        const max_cell_voltage = Number(this.getState(EntityKey.max_cell_voltage, 3, "", "number"));
+        const balanceOnOff = this.getState(EntityKey.balancer, 0, '', 'switch');
 
-        this.shouldBalance = this.maxDeltaV >= triggerV;
+        this.shouldBalance = balanceCurrent != 0; // this is enough
 
         const powerClass = powerNumber > 0 ? 'power-positive' : powerNumber < 0 ? 'power-negative' : 'power-even'
         const balanceClass = balanceCurrent > 0 ? 'balance-positive' : balanceCurrent < 0 ? 'balance-negative' : 'balance-even';
@@ -236,6 +247,9 @@ export class JkBmsDefaultLayout extends LitElement {
 
         const runtime = this.getState(EntityKey.total_runtime_formatted);
         const header = runtime && runtime != "unknown" ? html` | ${localize('html_texts.time')}: <b><font color="#3090C7">${runtime.toUpperCase()}</font></b>` : ''
+        
+        const socDecimals = this.config.socDecimals ?? 0;
+        const customDecimals = this.config.customDecimals ?? 0;
 
         return html`
       <ha-card>
@@ -259,10 +273,11 @@ export class JkBmsDefaultLayout extends LitElement {
             <div class="clickable center" @click=${(e) => this._navigate(e, EntityKey.total_voltage)}>
               <b><font color="#41CD52" size="6">${this.getState(EntityKey.total_voltage)} ${localize('html_texts.volt')}</font></b>
             </div>
-              ${localize('stats.power')} <span class="clickable ${powerClass}" @click=${(e) => this._navigate(e, EntityKey.power)}>${this.getState(EntityKey.power)} W</span><br>
-              ${localize('stats.capacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_battery_capacity_setting)}>${this.getState(EntityKey.total_battery_capacity_setting)} Ah</span><br>
-              ${localize('stats.cycleCapacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_charging_cycle_capacity)}>${this.getState(EntityKey.total_charging_cycle_capacity)} Ah</span><br>
+              ${localize('stats.power')} <span class="clickable ${powerClass}" @click=${(e) => this._navigate(e, EntityKey.power)}>${this.getState(EntityKey.power, customDecimals)} W</span><br>
+              ${localize('stats.capacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_battery_capacity_setting)}>${this.getState(EntityKey.total_battery_capacity_setting, customDecimals)} Ah</span><br>
+              ${localize('stats.cycleCapacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_charging_cycle_capacity)}>${this.getState(EntityKey.total_charging_cycle_capacity, customDecimals)} Ah</span><br>
               ${localize('stats.averageCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.average_cell_voltage)}>${this.getState(EntityKey.average_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
+              ${localize('stats.minCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.min_cell_voltage)}>${this.getState(EntityKey.min_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
               ${localize('stats.balanceCurrent')} <span class="${balanceClass}">${balanceCurrent.toFixed(1)} A</span>
               ${this._renderTemps(1)}
           </div>
@@ -271,20 +286,22 @@ export class JkBmsDefaultLayout extends LitElement {
             <div class="clickable center" @click=${(e) => this._navigate(e, EntityKey.current)}>
               <b><font color="#41CD52" size="6">${this.getState(EntityKey.current)} A</font></b>
             </div>
-              ${localize('stats.stateOfCharge')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>${this.getState(EntityKey.state_of_charge)} %</span><br>
-              ${localize('stats.remainingAmps')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>${this.getState(EntityKey.capacity_remaining)} Ah</span><br>
-              ${localize('stats.cycles')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.charging_cycles)}>${this.getState(EntityKey.charging_cycles)}</span><br>
+              ${localize('stats.stateOfCharge')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>${this.getState(EntityKey.state_of_charge, socDecimals)} %</span><br>
+              ${localize('stats.remainingAmps')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>${this.getState(EntityKey.capacity_remaining, customDecimals)} Ah</span><br>
+              ${localize('stats.cycles')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.charging_cycles)}>${this.getState(EntityKey.charging_cycles, customDecimals)}</span><br>
               ${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.maxDeltaV)} </span><br>
+              ${localize('stats.maxCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.max_cell_voltage)}>${this.getState(EntityKey.max_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
               ${localize('stats.mosfetTemp')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${this.getState(EntityKey.power_tube_temperature)} °C</span>
               ${this._renderTemps(2)}
           </div>
         </div>
+        
+        ${this.shouldBalance ? html`
+        <svg class="flow-line" id="flow-svg">
+            <path id="flow-path" fill="none" />
+        </svg>` : ''}
 
-          <svg class="flow-line" id="flow-svg">
-              <path id="flow-path" fill="none" />
-          </svg>
-
-          <div class="grid grid-${this.config.cellColumns ?? 2}">
+        <div class="grid grid-${this.config.cellColumns ?? 2}">
           ${this._renderCells(this.config.cellLayout == "bankMode")}
         </div>
       </ha-card>
@@ -336,7 +353,7 @@ export class JkBmsDefaultLayout extends LitElement {
         this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
         this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
 
-        if (!this.minCellId || !this.maxCellId || !this.maxDeltaV || this.maxDeltaV == 0 || true) {
+        if (!this.minCellId || !this.maxCellId || !this.maxDeltaV || this.maxDeltaV == 0) {
             this.calculateDynamicMinMaxCellId(totalCells)
         }
 
@@ -436,10 +453,11 @@ export class JkBmsDefaultLayout extends LitElement {
         const maxRect = maxEl.getBoundingClientRect();
 
         const getSideAnchor = (rect: DOMRect): { side: 'left' | 'right', x: number, y: number } => {
+            const columns = this.config?.cellColumns ?? 2;
             const centerX = rect.left + rect.width / 2;
             const midCardX = cardRect.left + cardRect.width / 2;
-            const side = centerX < midCardX ? 'right' : 'left';
-            const x = side === 'right' ? rect.right - cardRect.left : rect.left - cardRect.left;
+            const side = columns === 1 ? 'left' : (centerX < midCardX ? 'right' : 'left');
+            const x = columns === 1 ? cardRect.width / 2 - 80 : (side === 'right' ? rect.right - cardRect.left : rect.left - cardRect.left);
             const y = rect.top + rect.height / 2 - cardRect.top;
             return { side, x, y };
         };
