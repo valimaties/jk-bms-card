@@ -38,7 +38,6 @@ export class JkBmsCoreReactorLayout extends LitElement {
             color: var(--primary-text-color);
             padding: 8px;
             box-sizing: border-box;
-            background: var(--ha-card-background, var(--card-background-color, #1c1c1c));
             border-radius: var(--ha-card-border-radius, 12px);
         }
 
