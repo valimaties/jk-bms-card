@@ -21,7 +21,12 @@
     "tempSensorsCount": "Anzahl verfügbarer Temperatursensoren",
     "hasHeater": "Heizungs-Option wird verwendet",
     "socDecimals": "SOC Dezimalstellen",
-    "customDecimals": "Benutzerdefinierte Dezimalzahlen"
+    "customDecimals": "Benutzerdefinierte Dezimalzahlen",
+    "showTitle": "Titel",
+    "showButtons": "Schaltfl.",
+    "showMain": "Hauptteil",
+    "showCells": "Zellen",
+    "showCardVersion": "Kartenvers."
   },
   "switches": {
     "charge": "Laden",

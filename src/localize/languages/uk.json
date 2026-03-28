@@ -21,7 +21,12 @@
     "tempSensorsCount": "Кількість доступних датчиків температури",
     "hasHeater": "Використовується опція підігріву",
     "socDecimals": "знаки від коми",
-    "customDecimals": "Власні десяткові дроби"
+    "customDecimals": "Власні десяткові дроби",
+    "showTitle": "Заголовок",
+    "showButtons": "Кнопки",
+    "showMain": "Головна частина",
+    "showCells": "Елементи",
+    "showCardVersion": "Версія"
   },
   "switches": {
     "charge": "Заряд",

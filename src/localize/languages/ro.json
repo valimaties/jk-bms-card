@@ -18,10 +18,15 @@
     "minCellVoltage": "Tensiune minimă celulă (V)",
     "maxCellVoltage": "Tensiune maximă celulă (V)",
     "manualAssignment": "Atribuire manuală entități",
-    "tempSensorsCount": "Număr senzori temperatură disponibili",
+    "tempSensorsCount": "Număr senzori temperatură",
     "hasHeater": "Opțiunea încălzitor este utilizată",
     "socDecimals": "Zecimale SoC",
-    "customDecimals": "Zecimale alte controale"
+    "customDecimals": "Zecimale alte controale",
+    "showTitle": "Afișează Titlul",
+    "showButtons": "Afișează Butoane",
+    "showMain": "Afișează Main",
+    "showCells": "Afișează Celule",
+    "showCardVersion": "Afișează Versiune Card"
   },
   "switches": {
     "charge": "Încărcare",

@@ -1,7 +1,7 @@
 import { HomeAssistant, LovelaceCardEditor, LovelaceConfig } from 'custom-card-helpers';
 import { html, LitElement, TemplateResult } from 'lit';
 import { EDITOR_NAME, EntityKey } from './const';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { JkBmsCardConfig } from './interfaces';
 import { localize } from './localize/localize';
 import { fireEvent } from './helpers/utils';
@@ -12,8 +12,58 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
     @property() private _config!: JkBmsCardConfig;
     @property() lovelace?: LovelaceConfig;
 
+    @state() private _dynamicEntitySchema: any[] = [];
+
+    // Lista cu toate entitățile fixe (care nu depind de cellCount)
+    private readonly _fixedEntities = Object.values(EntityKey).filter(key => 
+        !key.startsWith('cell_voltage_') && 
+        !key.startsWith('cell_resistance_')
+    );
+
     public setConfig(config: JkBmsCardConfig): void {
-        this._config = { ...this._config, ...config };
+        this._config = { ...config };
+        this._updateDynamicEntitySchema();
+    }
+
+    private _updateDynamicEntitySchema(): void {
+        const cellCount = Math.min(this._config?.cellCount ?? 16, 96);
+
+        const dynamic: any[] = [];
+
+        // Cell Voltages 1 → cellCount
+        for (let i = 1; i <= cellCount; i++) {
+            const key = `cell_voltage_${i}`;
+            if (key in EntityKey) {
+                dynamic.push({
+                    name: key,
+                    selector: { entity: {} }
+                });
+            }
+        }
+
+        // Cell Resistances 1 → cellCount
+        for (let i = 1; i <= cellCount; i++) {
+            const key = `cell_resistance_${i}`;
+            if (key in EntityKey) {
+                dynamic.push({
+                    name: key,
+                    selector: { entity: {} }
+                });
+            }
+        }
+
+        this._dynamicEntitySchema = dynamic;
+    }
+
+    protected willUpdate(changedProperties: Map<PropertyKey, unknown>): void {
+        super.willUpdate(changedProperties);
+
+        if (changedProperties.has('_config')) {
+            const oldConfig = changedProperties.get('_config') as JkBmsCardConfig | undefined;
+            if (oldConfig?.cellCount !== this._config?.cellCount) {
+                this._updateDynamicEntitySchema();
+            }
+        }
     }
 
     protected render(): TemplateResult | void {
@@ -21,7 +71,13 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
             return html``;
         }
 
-        const entityConfigs = Object.values(EntityKey).map((key: string) => ({ name: key, selector: { entity: {} } }))
+        const entityConfigs = [
+            ...this._fixedEntities.map(key => ({
+                name: key,
+                selector: { entity: {} }
+            })),
+            ...this._dynamicEntitySchema
+        ];
 
         return html`
 			<ha-form
@@ -215,6 +271,33 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                     ],
                 },
                 {
+                    type: 'grid',
+                    title: 'showHideZones',
+                    column_min_width: '80px',
+                    schema: [
+                        {
+                            name: 'showTitle',
+                            selector: { boolean: {} },
+                        },
+                        {
+                            name: 'showButtons',
+                            selector: { boolean: {} },
+                        },
+                        {
+                            name: 'showMain',
+                            selector: { boolean: {} },
+                        },
+                        {
+                            name: 'showCells',
+                            selector: { boolean: {} },
+                        },
+                        {
+                            name: 'showCardVersion',
+                            selector: { boolean: {} },
+                        },
+                    ],
+                },
+                {
                     type: 'expandable',
                     title: localize('config.manualAssignment'),
                     schema: [
@@ -231,7 +314,17 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
 		`;
     }
     private _computeLabelCallback = (data) => localize(`config.${data.name}`) ?? data.name;
+    
     private _valueChanged(ev: CustomEvent): void {
-        fireEvent(this, 'config-changed', { config: ev.detail.value });
+        const config = { ...this._config };           // copy
+        Object.assign(config, ev.detail.value);       // merge shallow
+
+        this._config = config;
+
+        if ('cellCount' in ev.detail.value) {
+            this._updateDynamicEntitySchema();
+        }
+
+        fireEvent(this, 'config-changed', { config: this._config });
     }
 }
