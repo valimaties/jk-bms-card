@@ -852,9 +852,10 @@ export class JkBmsCoreReactorLayout extends LitElement {
                 ` : html``}
                 
                 <!-- Cells -->
+                ${showCells ? html`
                 <div class="cell-grid grid-${this.config.cellColumns ?? 2}">
                     ${this._renderCells()}
-                </div>
+                </div>` : html``}
                 ${showCardVersion ? html`
                 <div class="cardVersion">
                     <span class="version">
