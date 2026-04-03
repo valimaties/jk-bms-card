@@ -6,6 +6,7 @@ import { JkBmsCardConfig } from '../interfaces';
 import { globalData } from '../helpers/globals';
 import { configOrEnum, formatDeltaVoltage, getState, navigate } from '../helpers/utils';
 import { localize } from '../localize/localize';
+import {version} from '../../package.json';
 
 @customElement('jk-bms-core-reactor-layout')
 export class JkBmsCoreReactorLayout extends LitElement {
@@ -17,6 +18,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
     maxDeltaV: number = 0.000;
     shouldBalance: boolean = false;
     tempSensorsCount: number = 0;
+    VERSION = version;
 
     @property() private historyData: Record<string, any[]> = {};
     private _historyInterval?: number;
@@ -408,7 +410,6 @@ export class JkBmsCoreReactorLayout extends LitElement {
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px 0;
             z-index: 1;
         }
 
@@ -438,6 +439,15 @@ export class JkBmsCoreReactorLayout extends LitElement {
         .spark-area {
             fill-opacity: 0.2;
             stroke: none;
+        }
+        
+        .cardVersion {
+            text-align: right;
+        }
+        
+        .version {
+            font-style: italic;
+            font-size: 0.8rem;
         }
     `;
 
@@ -646,13 +656,12 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const hardwareVersion = this.getState(EntityKey.hardware_version);
         const softwareVersion = this.getState(EntityKey.software_version);
         const capacityVal = this.getState(EntityKey.total_battery_capacity_setting, customDecimals);
-        const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
-                        html`Bat 1 - ${localize('html_texts.capacity')}: <b> ${capacityVal} Ah</b></br>
-        HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b>`;
-
-        
         const runtime = this.getState(EntityKey.total_runtime_formatted);
-        const header = runtime && runtime != "unknown" ? html`${localize('html_texts.time')}: <b>${runtime.toUpperCase()}</b>` : '';
+        const header = runtime && runtime != "unknown" ? html` | ${localize('html_texts.time')}: <b>${runtime.toUpperCase()}</b>` : '';
+        const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
+                        html`Bat 1 - ${localize('html_texts.capacity')}: <b>${capacityVal} Ah</b></br>
+        HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b>${header}`;
+
         const current = parseFloat(this.getState(EntityKey.current));
         const charging_power = this.getState(EntityKey.charging_power, customDecimals);
         const discharging_power = this.getState(EntityKey.discharging_power, customDecimals);
@@ -675,30 +684,37 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const chargingCycles = parseFloat(this.getState(EntityKey.charging_cycles)).toFixed(0).toString();
 
         this.tempSensorsCount = this.config.tempSensorsCount;
+        const showTitle = this.config.showTitle;
+        const showButtons = this.config.showButtons;
+        const showMain = this.config.showMain;
+        const showCells = this.config.showCells;
+        const showCardVersion = this.config.showCardVersion;
 
         this.calculateDynamicMinMax();
 
         return html`
             <ha-card class="container">
-                <div class="header clickable" @click=${(e) => this._navigate(e, EntityKey.software_version)}>
-                    ${title}
-                </div>
+                ${showTitle ? html`
                 <div class="header clickable" @click=${(e) => this._navigate(e, EntityKey.total_runtime_formatted)}>
-                    ${header}
-                </div>
-
+                    ${title}
+                </div>    
+                ` : ``}
+                
+                ${showMain ? html`
                 <div class="top-section">
                     <!-- Solar/Grid Node -->
                     <div class="flow-node">
-                        <div class="icon-circle clickable"
-                             @click=${(e) => this._navigate(e, EntityKey.charging, 'switch')}>
+                        <div class="icon-circle${showButtons ? ' clickable' : ''}" 
+                             @click=${showButtons ? (e) => this._navigate(e, EntityKey.charging, 'switch') : undefined } >
                             <ha-icon icon="mdi:solar-power" style="color: ${isChargingFlow ? 'var(--solar-color)' : '#444'};"></ha-icon>
                         </div>
                         <div class="node-label">${localize('html_texts.grid-solar')}</div>
+                        ${showButtons ? html`
                         <div class="node-status">
                             ${localize('html_texts.charge')}: <span
                                 class="${isCharging ? 'status-on' : 'status-off'}">${isCharging ? 'ON' : 'OFF'}</span>
-                        </div>
+                        </div>    
+                        ` : html``}
                         <div class="node-status">
                             <div class="stat-value val-white clickable"
                                  @click=${(e) => this._navigate(e, EntityKey.charging_power)}>${charging_power} W
@@ -725,15 +741,17 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
                     <!-- Load Node -->
                     <div class="flow-node">
-                        <div class="icon-circle clickable"
-                             @click=${(e) => this._navigate(e, EntityKey.discharging, 'switch')}>
+                        <div class="icon-circle${showButtons ? ' clickable' : '' }" 
+                            @click=${showButtons ? (e) => this._navigate(e, EntityKey.discharging, 'switch') : undefined }>
                             <ha-icon icon="mdi:power-plug" style="color: ${isDischargingFlow ? 'var(--discharge-color)' : '#444'};"></ha-icon>
                         </div>
                         <div class="node-label">${localize('html_texts.load')}</div>
+                        ${showButtons ? html`
                         <div class="node-status">
                             ${localize('html_texts.discharge')}: <span
                                 class="${isDischarging ? 'status-on' : 'status-off'}">${isDischarging ? 'ON' : 'OFF'}</span>
-                        </div>
+                        </div>    
+                        ` : html``}
                         
                         <div class="node-status">
                             <div class="stat-value val-white clickable"
@@ -758,8 +776,8 @@ export class JkBmsCoreReactorLayout extends LitElement {
                             </marker>
                         </defs>
                     </svg>
-                </div>
-
+                </div>    
+                
                 <!-- Stats Panels -->
                 <div class="middle-grid">
                     <div class="stats-panel">
@@ -791,7 +809,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
                         <div class="metric-group">
                             ${this._renderSparkline(EntityKey.delta_cell_voltage, '#41CD52')}
-                            <div class="stat-label">${localize('html_texts.delta')} ${this.config.deltaVoltageUnit || `${localize('html_texts.volt')}`}:</div>
+                            <div class="stat-label">${localize('html_texts.delta')} ${this.config.deltaVoltageUnit || localize('html_texts.volt')}:</div>
                             <div class="stat-value val-green clickable"
                                  @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}>
                                 ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.maxDeltaV)}
@@ -831,12 +849,20 @@ export class JkBmsCoreReactorLayout extends LitElement {
                         </div>
                     </div>
                 </div>
-
+                ` : html``}
+                
                 <!-- Cells -->
+                ${showCells ? html`
                 <div class="cell-grid grid-${this.config.cellColumns ?? 2}">
                     ${this._renderCells()}
+                </div>` : html``}
+                ${showCardVersion ? html`
+                <div class="cardVersion">
+                    <span class="version">
+                        v.${this.VERSION}
+                    </span>
                 </div>
-
+                ` : html``}
             </ha-card>
         `;
     }

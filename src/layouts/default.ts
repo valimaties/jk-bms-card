@@ -6,6 +6,7 @@ import { JkBmsCardConfig } from '../interfaces';
 import { localize } from '../localize/localize';
 import { globalData } from '../helpers/globals';
 import {navigate, getState, configOrEnum, formatDeltaVoltage} from '../helpers/utils';
+import {version} from '../../package.json';
 
 @customElement('jk-bms-default-layout')
 export class JkBmsDefaultLayout extends LitElement {
@@ -16,6 +17,7 @@ export class JkBmsDefaultLayout extends LitElement {
     maxCellId: string = '';
     maxDeltaV: number = 0.000;
     shouldBalance: boolean = false;
+    VERSION = version;
 
     static styles = css`
         .grid {
@@ -188,6 +190,15 @@ export class JkBmsDefaultLayout extends LitElement {
             filter: drop-shadow(0 0 4px #41cd52);
         }
 
+        .cardVersion {
+            text-align: right;
+        }
+        
+        .version {
+            font-style: italic;
+            font-size: 0.8rem;
+        }
+
         @keyframes dashmove {
             from {
                 stroke-dashoffset: 0;
@@ -226,16 +237,19 @@ export class JkBmsDefaultLayout extends LitElement {
 
         const hardwareVersion = this.getState(EntityKey.hardware_version);
         const softwareVersion = this.getState(EntityKey.software_version);
+        const runtime = this.getState(EntityKey.total_runtime_formatted);
+        const header = runtime && runtime != "unknown" ? html`${localize('html_texts.time')}: <b><font color="#3090C7">${runtime.toUpperCase()}</font></b>` : ''
+
         const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
             html`Bat 1 - ${localize('html_texts.capacity')}: <b> ${this.getState(EntityKey.total_battery_capacity_setting)} Ah</b></br>
-                HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b>`;
+                HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b> | ${header}`;
 
         this.maxDeltaV = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));
         const balanceCurrent = parseFloat(this.getState(EntityKey.balancing_current, 2, '0'));
         const powerNumber = parseFloat(this.getState(EntityKey.power, 2, '0'));
         const triggerV = Number(this.getState(EntityKey.balance_trigger_voltage, 2, "", "number"));
         const balance_starting_voltage = Number(this.getState(EntityKey.balance_starting_voltage, 3, "", "number"));
-        const min_cell_voltage = Number(this.getState(EntityKey.max_cell_voltage, 3, "", "number"));
+        const min_cell_voltage = Number(this.getState(EntityKey.min_cell_voltage, 3, "", "number"));
         const max_cell_voltage = Number(this.getState(EntityKey.max_cell_voltage, 3, "", "number"));
         const balanceOnOff = this.getState(EntityKey.balancer, 0, '', 'switch');
 
@@ -245,67 +259,84 @@ export class JkBmsDefaultLayout extends LitElement {
         const balanceClass = balanceCurrent > 0 ? 'balance-positive' : balanceCurrent < 0 ? 'balance-negative' : 'balance-even';
         const deltaClass = this.shouldBalance ? 'delta-needs-balancing' : 'delta-ok';
 
-        const runtime = this.getState(EntityKey.total_runtime_formatted);
-        const header = runtime && runtime != "unknown" ? html` | ${localize('html_texts.time')}: <b><font color="#3090C7">${runtime.toUpperCase()}</font></b>` : ''
-        
         const socDecimals = this.config.socDecimals ?? 0;
         const customDecimals = this.config.customDecimals ?? 0;
+        const showTitle = this.config.showTitle;
+        const showButtons = this.config.showButtons;
+        const showMain = this.config.showMain;
+        const showCells = this.config.showCells;
+        const showCardVersion = this.config.showCardVersion;
 
         return html`
-      <ha-card>
-        <div class="grid grid-1 p-3 section-padding">
-          <div class="center clickable" @click=${(e) => this._navigate(e, EntityKey.total_runtime_formatted)}>
-            ${title}${header}
-          </div>
-        </div>
-
-        <div class="grid grid-${this.config.hasHeater == '1' ? '4' : '3'}">
-          ${this._renderSwitch(EntityKey.charging, 'charge')}
-          ${this._renderSwitch(EntityKey.discharging, 'discharge')}
-          ${this._renderSwitch(EntityKey.balancer, 'balance')}
-          ${this.config.hasHeater == '1' ? this._renderSwitch(EntityKey.heater, 'heater') : ''}
-        </div>
-          
-          ${this._renderError()}
-
-        <div class="grid grid-2 section-padding">
-          <div class="stats-padding stats-border">
-            <div class="clickable center" @click=${(e) => this._navigate(e, EntityKey.total_voltage)}>
-              <b><font color="#41CD52" size="6">${this.getState(EntityKey.total_voltage)} ${localize('html_texts.volt')}</font></b>
+        <ha-card>
+            <div class="grid grid-1 p-3 section-padding">
+                <div class="center clickable" @click=${(e) => this._navigate(e, EntityKey.total_runtime_formatted)}>
+                    ${showTitle ? title : ''}
+                </div>
             </div>
-              ${localize('stats.power')} <span class="clickable ${powerClass}" @click=${(e) => this._navigate(e, EntityKey.power)}>${this.getState(EntityKey.power, customDecimals)} W</span><br>
-              ${localize('stats.capacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_battery_capacity_setting)}>${this.getState(EntityKey.total_battery_capacity_setting, customDecimals)} Ah</span><br>
-              ${localize('stats.cycleCapacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_charging_cycle_capacity)}>${this.getState(EntityKey.total_charging_cycle_capacity, customDecimals)} Ah</span><br>
-              ${localize('stats.averageCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.average_cell_voltage)}>${this.getState(EntityKey.average_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
-              ${localize('stats.minCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.min_cell_voltage)}>${this.getState(EntityKey.min_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
-              ${localize('stats.balanceCurrent')} <span class="${balanceClass}">${balanceCurrent.toFixed(1)} A</span>
-              ${this._renderTemps(1)}
-          </div>
 
-          <div class="stats-padding stats-border">
-            <div class="clickable center" @click=${(e) => this._navigate(e, EntityKey.current)}>
-              <b><font color="#41CD52" size="6">${this.getState(EntityKey.current)} A</font></b>
+            ${showButtons ? html`
+            <div class="grid grid-${ this.config.hasHeater == '1' ? '4' : '3'}">
+                ${this._renderSwitch(EntityKey.charging, 'charge')}
+                ${this._renderSwitch(EntityKey.discharging, 'discharge')}
+                ${this._renderSwitch(EntityKey.balancer, 'balance')}
+                ${this.config.hasHeater == '1' ? this._renderSwitch(EntityKey.heater, 'heater') : ''}
+            </div>    
+            ` : html``}
+            
+            
+            ${this._renderError()}
+            
+            ${showMain ? html`
+            <div class="grid grid-2 section-padding">
+                <div class="stats-padding stats-border">
+                    <div class="clickable center" @click=${(e) => this._navigate(e, EntityKey.total_voltage)}>
+                    <b><font color="#41CD52" size="6">${this.getState(EntityKey.total_voltage)} ${localize('html_texts.volt')}</font></b>
+                    </div>
+                    ${localize('stats.power')} <span class="clickable ${powerClass}" @click=${(e) => this._navigate(e, EntityKey.power)}>${this.getState(EntityKey.power, customDecimals)} W</span><br>
+                    ${localize('stats.capacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_battery_capacity_setting)}>${this.getState(EntityKey.total_battery_capacity_setting, customDecimals)} Ah</span><br>
+                    ${localize('stats.cycleCapacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_charging_cycle_capacity)}>${this.getState(EntityKey.total_charging_cycle_capacity, customDecimals)} Ah</span><br>
+                    ${localize('stats.averageCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.average_cell_voltage)}>${this.getState(EntityKey.average_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
+                    ${EntityKey.min_cell_voltage && this.getState(EntityKey.min_cell_voltage) != '' ? html`${localize('stats.minCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.min_cell_voltage)}>${this.getState(EntityKey.min_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>` : ''}
+                    ${localize('stats.balanceCurrent')} <span class="${balanceClass}">${balanceCurrent.toFixed(1)} A</span>
+                    ${this._renderTemps(1)}
+                </div>
+
+                <div class="stats-padding stats-border">
+                    <div class="clickable center" @click=${(e) => this._navigate(e, EntityKey.current)}>
+                    <b><font color="#41CD52" size="6">${this.getState(EntityKey.current)} A</font></b>
+                    </div>
+                    ${localize('stats.stateOfCharge')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>${this.getState(EntityKey.state_of_charge, socDecimals)} %</span><br>
+                    ${localize('stats.remainingAmps')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>${this.getState(EntityKey.capacity_remaining, customDecimals)} Ah</span><br>
+                    ${localize('stats.cycles')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.charging_cycles)}>${this.getState(EntityKey.charging_cycles, customDecimals)}</span><br>
+                    ${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.maxDeltaV)} </span><br>
+                    ${EntityKey.max_cell_voltage && this.getState(EntityKey.max_cell_voltage) != '' ? html`${localize('stats.maxCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.max_cell_voltage)}>${this.getState(EntityKey.max_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>` : ''}
+                    ${localize('stats.mosfetTemp')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${this.getState(EntityKey.power_tube_temperature)} °C</span>
+                    ${this._renderTemps(2)}
+                </div>
             </div>
-              ${localize('stats.stateOfCharge')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>${this.getState(EntityKey.state_of_charge, socDecimals)} %</span><br>
-              ${localize('stats.remainingAmps')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>${this.getState(EntityKey.capacity_remaining, customDecimals)} Ah</span><br>
-              ${localize('stats.cycles')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.charging_cycles)}>${this.getState(EntityKey.charging_cycles, customDecimals)}</span><br>
-              ${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.maxDeltaV)} </span><br>
-              ${localize('stats.maxCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.max_cell_voltage)}>${this.getState(EntityKey.max_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
-              ${localize('stats.mosfetTemp')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${this.getState(EntityKey.power_tube_temperature)} °C</span>
-              ${this._renderTemps(2)}
-          </div>
-        </div>
-        
-        ${this.shouldBalance ? html`
-        <svg class="flow-line" id="flow-svg">
-            <path id="flow-path" fill="none" />
-        </svg>` : ''}
-
-        <div class="grid grid-${this.config.cellColumns ?? 2}">
-          ${this._renderCells(this.config.cellLayout == "bankMode")}
-        </div>
-      </ha-card>
-    `;
+            
+            ${this.shouldBalance ? html`
+            <svg class="flow-line" id="flow-svg">
+                <path id="flow-path" fill="none" />
+            </svg>` : ''}   
+            ` : html``}
+            
+            ${showCells ? html`
+            <div class="grid grid-${this.config.cellColumns ?? 2}">
+                ${this._renderCells(this.config.cellLayout == "bankMode")}
+            </div>    
+            `:html``}
+            ${showCardVersion ? html`
+            <div class="cardVersion">
+                <span class="version">
+                    v.${this.VERSION}
+                </span>
+            </div>
+            ` : html``}
+            
+        </ha-card>
+        `;
     }
     updated() {
         requestAnimationFrame(() => this._updateFlowLine());

@@ -18,10 +18,15 @@
     "minCellVoltage": "Min Cell Voltage (V)",
     "maxCellVoltage": "Max Cell Voltage (V)",
     "manualAssignment": "Manual entity assignment",
-    "tempSensorsCount": "Number of temperature sensors available",
+    "tempSensorsCount": "No. of temp. sensors available",
     "hasHeater": "Heater option is used",
     "socDecimals": "SoC Decimals",
-    "customDecimals": "Custom Decimals"
+    "customDecimals": "Custom Decimals",
+    "showTitle": "Show Title",
+    "showButtons": "Show Buttons",
+    "showMain": "Show Main",
+    "showCells": "Show Cells",
+    "showCardVersion": "Show Card Version"
   },
   "switches": {
     "charge": "Charge",
