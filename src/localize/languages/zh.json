@@ -1,0 +1,71 @@
+{
+  "common": {
+    "title": "JK BMS 卡",
+    "description": "可自定义的 Home Assistant 卡片，用于模拟 JK BMS 屏幕",
+    "version": "版本"
+  },
+  "config": {
+    "language": "语言",
+    "title": "标题",
+    "prefix": "传感器前缀",
+    "cellCount": "电池数量",
+    "cellColumns": "列数",
+    "cellLayout": "电池布局",
+    "layout": "布局",
+    "deltaVoltageUnit": "电压差单位",
+    "cellColorMode": "电池颜色模式",
+    "cellOrientation": "电池方向",
+    "minCellVoltage": "最小电池电压 (V)",
+    "maxCellVoltage": "最大电池电压 (V)",
+    "manualAssignment": "手动实体分配",
+    "tempSensorsCount": "可用温度传感器数量",
+    "hasHeater": "使用加热器选项",
+    "socDecimals": "SOC 小数位数",
+    "customDecimals": "自定义小数位",
+    "showTitle": "显示标题",
+    "showButtons": "显示按钮",
+    "showMain": "显示主面板",
+    "showCells": "显示电池",
+    "showCardVersion": "显示卡片版本"
+  },
+  "switches": {
+    "charge": "充电",
+    "discharge": "放电",
+    "balance": "均衡",
+    "heater": "加热器"
+  },
+  "stats": {
+    "power": "功率:",
+    "capacity": "容量:",
+    "cycleCapacity": "循环容量:",
+    "averageCellV": "平均电池电压:",
+    "balanceCurrent": "均衡电流:",
+    "stateOfCharge": "SOC:",
+    "remainingAmps": "剩余电流:",
+    "cycles": "循环次数:",
+    "delta": "电压差:",
+    "mosfetTemp": "MOS 温度:",
+    "minCellV": "最小电池电压:",
+    "maxCellV": "最大电池电压:",
+    "temperature_sensor_1": "温度 1:",
+    "temperature_sensor_2": "温度 2:",
+    "temperature_sensor_3": "温度 3:",
+    "temperature_sensor_4": "温度 4:"
+  },
+  "html_texts": {
+    "capacity": "容量",
+    "time": "时间",
+    "grid-solar": "电网/太阳能",
+    "load": "负载",
+    "total-voltage": "总电压",
+    "current": "电流",
+    "mosfetTemp": "MOS 温度",
+    "delta": "电压差",
+    "temperature_sensor": "温度",
+    "balancing": "均衡中",
+    "volt": "伏特",
+    "charge": "充电",
+    "discharge": "放电",
+    "remaining": "剩余"
+  }
+}
