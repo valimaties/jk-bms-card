@@ -9,6 +9,7 @@ const languages: any = {
   uk: uk,
   ro: ro,
   de: de,
+  ru: ru,
 };
 
 export function localize(string: string, search = '', replace = '') {
