@@ -1,0 +1,71 @@
+{
+  "common": {
+    "title": "Carte JK BMS",
+    "description": "Une carte Home Assistant personnalisable pour émuler l'écran JK BMS",
+    "version": "Version"
+  },
+  "config": {
+    "language": "Langue",
+    "title": "Titre",
+    "prefix": "Préfixe des capteurs",
+    "cellCount": "Nombre de cellules",
+    "cellColumns": "Nombre de colonnes",
+    "cellLayout": "Disposition des cellules",
+    "layout": "Disposition",
+    "deltaVoltageUnit": "Unité de tension delta",
+    "cellColorMode": "Mode couleur des cellules",
+    "cellOrientation": "Orientation des cellules",
+    "minCellVoltage": "Tension minimale de la cellule (V)",
+    "maxCellVoltage": "Tension maximale de la cellule (V)",
+    "manualAssignment": "Attribution manuelle des entités",
+    "tempSensorsCount": "Nombre de capteurs de température disponibles",
+    "hasHeater": "Option chauffage activée",
+    "socDecimals": "Décimales SOC",
+    "customDecimals": "Décimales personnalisées",
+    "showTitle": "Afficher le titre",
+    "showButtons": "Afficher les boutons",
+    "showMain": "Afficher le panneau principal",
+    "showCells": "Afficher les cellules",
+    "showCardVersion": "Afficher la version de la carte"
+  },
+  "switches": {
+    "charge": "Charge",
+    "discharge": "Décharge",
+    "balance": "Équilibrage",
+    "heater": "Chauffage"
+  },
+  "stats": {
+    "power": "Puissance :",
+    "capacity": "Capacité :",
+    "cycleCapacity": "Capacité du cycle :",
+    "averageCellV": "Tension moyenne cellule :",
+    "balanceCurrent": "Courant d'équilibrage :",
+    "stateOfCharge": "SOC :",
+    "remainingAmps": "Restant :",
+    "cycles": "Cycles :",
+    "delta": "Delta tension :",
+    "mosfetTemp": "Temp MOSFET :",
+    "minCellV": "Tension min cellule :",
+    "maxCellV": "Tension max cellule :",
+    "temperature_sensor_1": "Temp. 1 :",
+    "temperature_sensor_2": "Temp. 2 :",
+    "temperature_sensor_3": "Temp. 3 :",
+    "temperature_sensor_4": "Temp. 4 :"
+  },
+  "html_texts": {
+    "capacity": "Capacité",
+    "time": "Temps",
+    "grid-solar": "Réseau/Solaire",
+    "load": "Charge",
+    "total-voltage": "Tension totale",
+    "current": "Courant",
+    "mosfetTemp": "Temp MOSFET",
+    "delta": "Delta",
+    "temperature_sensor": "Temp",
+    "balancing": "Équilibrage",
+    "volt": "V",
+    "charge": "Charge",
+    "discharge": "Décharge",
+    "remaining": "Restant"
+  }
+}
