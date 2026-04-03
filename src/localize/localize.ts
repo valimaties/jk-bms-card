@@ -3,6 +3,10 @@ import * as uk from './languages/uk.json';
 import * as ro from './languages/ro.json';
 import * as de from './languages/de.json';
 import * as ru from './languages/ru.json';
+import * as zh from './languages/zh.json';
+import * as pl from './languages/pl.json';
+import * as es from './languages/es.json';
+import * as fr from './languages/fr.json';
 import { globalData } from '../helpers/globals';
 
 const languages: any = {
@@ -11,6 +15,10 @@ const languages: any = {
   ro: ro,
   de: de,
   ru: ru,
+  zh: zh,
+  pl: pl,
+  es: es,
+  fr: fr,
 };
 
 export function localize(string: string, search = '', replace = '') {
