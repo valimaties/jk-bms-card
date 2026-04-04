@@ -22,11 +22,11 @@
     "hasHeater": "Opción de calefactor activada",
     "socDecimals": "Decimales de SOC",
     "customDecimals": "Decimales personalizados",
-    "showTitle": "Mostrar título",
-    "showButtons": "Mostrar botones",
-    "showMain": "Mostrar panel principal",
-    "showCells": "Mostrar celdas",
-    "showCardVersion": "Mostrar versión de la tarjeta"
+    "showTitle": "Título",
+    "showButtons": "Botones",
+    "showMain": "Principal",
+    "showCells": "Celdas",
+    "showCardVersion": "Versión"
   },
   "switches": {
     "charge": "Cargar",
