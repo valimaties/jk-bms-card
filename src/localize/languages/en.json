@@ -22,11 +22,11 @@
     "hasHeater": "Heater option is used",
     "socDecimals": "SoC Decimals",
     "customDecimals": "Custom Decimals",
-    "showTitle": "Show Title",
-    "showButtons": "Show Buttons",
-    "showMain": "Show Main",
-    "showCells": "Show Cells",
-    "showCardVersion": "Show Card Version"
+    "showTitle": "Title",
+    "showButtons": "Buttons",
+    "showMain": "Main",
+    "showCells": "Cells",
+    "showCardVersion": "Version"
   },
   "switches": {
     "charge": "Charge",

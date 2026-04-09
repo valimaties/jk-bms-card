@@ -1,0 +1,71 @@
+{
+  "common": {
+    "title": "JK BMS Karta",
+    "description": "Konfigurowalna karta Home Assistant do emulacji ekranu JK BMS",
+    "version": "Wersja"
+  },
+  "config": {
+    "language": "Język",
+    "title": "Tytuł",
+    "prefix": "Prefiks sensorów",
+    "cellCount": "Liczba ogniw",
+    "cellColumns": "Liczba kolumn",
+    "cellLayout": "Układ ogniw",
+    "layout": "Układ",
+    "deltaVoltageUnit": "Jednostka różnicy napięcia",
+    "cellColorMode": "Tryb koloru ogniw",
+    "cellOrientation": "Orientacja ogniw",
+    "minCellVoltage": "Minimalne napięcie ogniwa (V)",
+    "maxCellVoltage": "Maksymalne napięcie ogniwa (V)",
+    "manualAssignment": "Ręczne przypisanie encji",
+    "tempSensorsCount": "Liczba dostępnych czujników temperatury",
+    "hasHeater": "Opcja grzałki włączona",
+    "socDecimals": "Miejsca po przecinku SOC",
+    "customDecimals": "Własne miejsca po przecinku",
+  "showTitle": "Tytuł",
+  "showButtons": "Przyciski",
+  "showMain": "Panel",
+  "showCells": "Ogniwa",
+  "showCardVersion": "Wersja"
+  },
+  "switches": {
+    "charge": "Ładowanie",
+    "discharge": "Rozładowanie",
+    "balance": "Balansowanie",
+    "heater": "Grzałka"
+  },
+  "stats": {
+    "power": "Moc:",
+    "capacity": "Pojemność:",
+    "cycleCapacity": "Pojemność cyklu:",
+    "averageCellV": "Średnie napięcie ogniwa:",
+    "balanceCurrent": "Prąd balansowania:",
+    "stateOfCharge": "SOC:",
+    "remainingAmps": "Pozostałe:",
+    "cycles": "Cyklów:",
+    "delta": "Różnica napięcia:",
+    "mosfetTemp": "Temperatura MOSFET:",
+    "minCellV": "Minimalne napięcie ogniwa:",
+    "maxCellV": "Maksymalne napięcie ogniwa:",
+    "temperature_sensor_1": "Temp. 1:",
+    "temperature_sensor_2": "Temp. 2:",
+    "temperature_sensor_3": "Temp. 3:",
+    "temperature_sensor_4": "Temp. 4:"
+  },
+  "html_texts": {
+    "capacity": "Pojemność",
+    "time": "Czas",
+    "grid-solar": "Sieć/Solar",
+    "load": "Obciążenie",
+    "total-voltage": "Całkowite napięcie",
+    "current": "Prąd",
+    "mosfetTemp": "Temp. MOSFET",
+    "delta": "Delta",
+    "temperature_sensor": "Temp",
+    "balancing": "Balansowanie",
+    "volt": "V",
+    "charge": "Ładowanie",
+    "discharge": "Rozładowanie",
+    "remaining": "Pozostałe"
+  }
+}

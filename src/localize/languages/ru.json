@@ -22,11 +22,11 @@
     "hasHeater": "Используется подогрев",
     "socDecimals": "Знаков после запятой",
     "customDecimals": "Пользовательские десятичные",
-    "showTitle": "Показывать заголовок",
-    "showButtons": "Показывать кнопки",
-    "showMain": "Показывать основную часть",
-    "showCells": "Показывать ячейки",
-    "showCardVersion": "Показывать версию карточки"
+    "showTitle": "Заголовок",
+    "showButtons": "Кнопки",
+    "showMain": "Панель",
+    "showCells": "Ячейки",
+    "showCardVersion": "Версия"
   },
   "switches": {
     "charge": "Заряд",

@@ -1,0 +1,71 @@
+{
+  "common": {
+    "title": "Tarjeta JK BMS",
+    "description": "Una tarjeta personalizable de Home Assistant para emular la pantalla JK BMS",
+    "version": "Versión"
+  },
+  "config": {
+    "language": "Idioma",
+    "title": "Título",
+    "prefix": "Prefijo de los sensores",
+    "cellCount": "Número de celdas",
+    "cellColumns": "Número de columnas",
+    "cellLayout": "Diseño de celdas",
+    "layout": "Diseño",
+    "deltaVoltageUnit": "Unidad de voltaje delta",
+    "cellColorMode": "Modo de color de celdas",
+    "cellOrientation": "Orientación de celdas",
+    "minCellVoltage": "Voltaje mínimo de celda (V)",
+    "maxCellVoltage": "Voltaje máximo de celda (V)",
+    "manualAssignment": "Asignación manual de entidades",
+    "tempSensorsCount": "Número de sensores de temperatura disponibles",
+    "hasHeater": "Opción de calefactor activada",
+    "socDecimals": "Decimales de SOC",
+    "customDecimals": "Decimales personalizados",
+    "showTitle": "Título",
+    "showButtons": "Botones",
+    "showMain": "Principal",
+    "showCells": "Celdas",
+    "showCardVersion": "Versión"
+  },
+  "switches": {
+    "charge": "Cargar",
+    "discharge": "Descargar",
+    "balance": "Balancear",
+    "heater": "Calefactor"
+  },
+  "stats": {
+    "power": "Potencia:",
+    "capacity": "Capacidad:",
+    "cycleCapacity": "Capacidad del ciclo:",
+    "averageCellV": "Voltaje promedio celda:",
+    "balanceCurrent": "Corriente de balanceo:",
+    "stateOfCharge": "SOC:",
+    "remainingAmps": "Restante:",
+    "cycles": "Ciclos:",
+    "delta": "Delta voltaje:",
+    "mosfetTemp": "Temp MOSFET:",
+    "minCellV": "Voltaje min celda:",
+    "maxCellV": "Voltaje max celda:",
+    "temperature_sensor_1": "Temp. 1:",
+    "temperature_sensor_2": "Temp. 2:",
+    "temperature_sensor_3": "Temp. 3:",
+    "temperature_sensor_4": "Temp. 4:"
+  },
+  "html_texts": {
+    "capacity": "Capacidad",
+    "time": "Tiempo",
+    "grid-solar": "Red/Solar",
+    "load": "Carga",
+    "total-voltage": "Voltaje total",
+    "current": "Corriente",
+    "mosfetTemp": "Temp MOSFET",
+    "delta": "Delta",
+    "temperature_sensor": "Temp",
+    "balancing": "Balanceo",
+    "volt": "V",
+    "charge": "Cargar",
+    "discharge": "Descargar",
+    "remaining": "Restante"
+  }
+}
