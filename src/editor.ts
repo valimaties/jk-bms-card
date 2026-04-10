@@ -134,7 +134,7 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                     schema: [
                         {
                             type: 'grid',
-                            column_max_width: '200px',
+                            column_min_width: '200px',
                             schema: [
                                 { name: 'prefix', selector: { text: {} } },
                                 { name: 'batteryNumber', selector: { number: { min: 1, max: 16, step: 1, mode: 'box' } } },

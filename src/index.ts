@@ -33,7 +33,7 @@ export class JkBmsCard extends LitElement {
 
     static getStubConfig() {
         return {
-            language: '',
+            language: 'auto',
             title: localize("title"),
             prefix: "jk_bms",
             batteryNumber: 1,
