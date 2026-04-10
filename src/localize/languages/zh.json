@@ -8,6 +8,7 @@
     "language": "语言",
     "title": "标题",
     "prefix": "实体前缀",
+    "batteryNumber": "电池编号",
     "cellCount": "电芯数量",
     "cellColumns": "每行电芯数",
     "cellLayout": "电芯布局方式",
@@ -53,6 +54,7 @@
     "temperature_sensor_4": "测温点四:"
   },
   "html_texts": {
+    "batNumber": "Bat. 编号",
     "capacity": "总容量设定",
     "time": "运行时长",
     "grid-solar": "电网/太阳能",

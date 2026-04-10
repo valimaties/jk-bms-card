@@ -87,18 +87,6 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
 				.schema=${[
                 {
                     type: 'grid',
-                    title: localize('config.title'),
-                    schema: [
-                        {
-                            type: 'grid',
-                            schema: [
-                                { name: 'title', selector: { text: {} } },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    type: 'grid',
                     title: localize('config.language'),
                     schema: [
                         {
@@ -115,10 +103,10 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                                         { label: 'Українська',       value: 'uk' },
                                         { label: 'German',           value: 'de' },
 										{ label: 'Русский',			 value: 'ru' },
-										{ label: 'Polski',            value: 'pl' },
-    									{ label: 'Français',          value: 'fr' },
-    									{ label: 'Español',           value: 'es' },
-    									{ label: '中文',               value: 'zh' }
+										{ label: 'Polski',           value: 'pl' },
+    									{ label: 'Français',         value: 'fr' },
+    									{ label: 'Español',          value: 'es' },
+    									{ label: '中文',              value: 'zh' }
                                     ],
                                     mode: 'dropdown',
                                     }
@@ -130,12 +118,26 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                 },
                 {
                     type: 'grid',
-                    title: localize('config.prefix'),
+                    title: localize('config.title'),
                     schema: [
                         {
                             type: 'grid',
                             schema: [
+                                { name: 'title', selector: { text: {} } },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    type: 'grid',
+                    title: localize('config.prefix'),
+                    schema: [
+                        {
+                            type: 'grid',
+                            column_max_width: '200px',
+                            schema: [
                                 { name: 'prefix', selector: { text: {} } },
+                                { name: 'batteryNumber', selector: { number: { min: 1, max: 16, step: 1, mode: 'box' } } },
                             ],
                         },
                     ],

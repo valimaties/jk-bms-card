@@ -239,9 +239,10 @@ export class JkBmsDefaultLayout extends LitElement {
         const softwareVersion = this.getState(EntityKey.software_version);
         const runtime = this.getState(EntityKey.total_runtime_formatted);
         const header = runtime && runtime != "unknown" ? html`${localize('html_texts.time')}: <b><font color="#3090C7">${runtime.toUpperCase()}</font></b>` : ''
+        const batNum = this.config.batteryNumber || 1;
 
         const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
-            html`Bat 1 - ${localize('html_texts.capacity')}: <b> ${this.getState(EntityKey.total_battery_capacity_setting)} Ah</b></br>
+            html`${localize('html_texts.batNumber')} ${batNum} - ${localize('html_texts.capacity')}: <b> ${this.getState(EntityKey.total_battery_capacity_setting)} Ah</b></br>
                 HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b> | ${header}`;
 
         this.maxDeltaV = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));

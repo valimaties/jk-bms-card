@@ -8,6 +8,7 @@
     "language": "Язык",
     "title": "Заголовок",
     "prefix": "Префикс датчиков",
+    "batteryNumber": "Номер батареи",
     "cellCount": "Количество ячеек",
     "cellColumns": "Количество столбцов",
     "cellLayout": "Расположение ячеек",
@@ -53,6 +54,7 @@
     "temperature_sensor_4": "Темп. 4:"
   },
   "html_texts": {
+    "batNumber": "Бат.",
     "capacity": "Ёмкость",
     "time": "Время",
     "grid-solar": "Сеть/Солнце",

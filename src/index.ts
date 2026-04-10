@@ -36,6 +36,7 @@ export class JkBmsCard extends LitElement {
             language: '',
             title: localize("title"),
             prefix: "jk_bms",
+            batteryNumber: 1,
             cellCount: 16,
             cellColumns: 2,
             cellLayout: "bankMode",
