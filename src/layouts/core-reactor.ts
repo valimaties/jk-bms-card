@@ -15,7 +15,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
     minCellId: string = '';
     maxCellId: string = '';
-    maxDeltaV: number = 0.000;
+    deltaV: number = 0.000;
     shouldBalance: boolean = false;
     tempSensorsCount: number = 0;
     VERSION = version;
@@ -691,7 +691,39 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const showCells = this.config.showCells;
         const showCardVersion = this.config.showCardVersion;
 
-        this.calculateDynamicMinMax();
+        this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
+        this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
+
+        const isValidCellId = (value: any): boolean => {
+            if (value == null) return false; 
+            const num = Number(value);
+            return !isNaN(num) && isFinite(num) && num >= 0;
+        };
+
+        const isValidDelta = (value: any): boolean => {
+            if (value == null) return false;
+            const num = Number(value);
+            return !isNaN(num) && isFinite(num) && num > 0;
+        };
+
+        const hasValidMinMax = isValidCellId(this.minCellId) && isValidCellId(this.maxCellId);
+        const hasValidDelta = isValidDelta(this.deltaV);
+
+        if (!hasValidMinMax || !hasValidDelta) {
+            //console.log('Default layout - minCellId and maxCellId are calculated dynamically!');
+            //console.log('DEBUG actual values:', {
+            //    minCellId: this.minCellId,
+            //    typeMin: typeof this.minCellId,
+            //    maxCellId: this.maxCellId,
+            //    typeMax: typeof this.maxCellId,
+            //    maxDeltaV: this.deltaV,
+            //    typeDelta: typeof this.deltaV,
+            //    hasValidMinMax,
+            //    hasValidDelta
+            //});
+
+            this.calculateDynamicMinMax();
+        } 
 
         return html`
             <ha-card class="container">
@@ -813,7 +845,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                             <div class="stat-label">${localize('html_texts.delta')} ${this.config.deltaVoltageUnit || localize('html_texts.volt')}:</div>
                             <div class="stat-value val-green clickable"
                                  @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}>
-                                ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.maxDeltaV)}
+                                ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.deltaV)}
                             </div>
                         </div>
                     </div>
@@ -892,13 +924,13 @@ export class JkBmsCoreReactorLayout extends LitElement {
         }
 
         if (minV === Infinity || maxV === -Infinity) {
-            this.maxDeltaV = 0;
+            this.deltaV = 0;
             this.minCellId = '';
             this.maxCellId = '';
         } else {
             this.minCellId = minId;
             this.maxCellId = maxId;
-            this.maxDeltaV = parseFloat((maxV - minV).toFixed(3));
+            this.deltaV = parseFloat((maxV - minV).toFixed(3));
         }
     }
 
