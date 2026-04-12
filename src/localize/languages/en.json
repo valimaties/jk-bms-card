@@ -23,9 +23,11 @@
     "hasHeater": "Heater option is used",
     "socDecimals": "SoC Decimals",
     "customDecimals": "Custom Decimals",
+    "showShowHide": "Show / Hide zones",
     "showTitle": "Title",
     "showButtons": "Buttons",
     "showMain": "Main",
+    "showMainStats": "Stats",
     "showCells": "Cells",
     "showCardVersion": "Version"
   },

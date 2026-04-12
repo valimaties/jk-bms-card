@@ -23,9 +23,11 @@
     "hasHeater": "Використовується опція підігріву",
     "socDecimals": "знаки від коми",
     "customDecimals": "Власні десяткові дроби",
+    "showShowHide": "Показати / Сховати зони",
     "showTitle": "Заголовок",
     "showButtons": "Кнопки",
     "showMain": "Панель",
+    "showMainStats": "Стат.",
     "showCells": "Елементи",
     "showCardVersion": "Версія"
   },

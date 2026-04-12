@@ -23,11 +23,13 @@
     "hasHeater": "Opcja grzałki włączona",
     "socDecimals": "Miejsca po przecinku SOC",
     "customDecimals": "Własne miejsca po przecinku",
-  "showTitle": "Tytuł",
-  "showButtons": "Przyciski",
-  "showMain": "Panel",
-  "showCells": "Ogniwa",
-  "showCardVersion": "Wersja"
+    "showShowHide": "Pokaż / Ukryj strefy",
+    "showTitle": "Tytuł",
+    "showButtons": "Przyciski",
+    "showMain": "Panel",
+    "showMainStats": "Stat.",
+    "showCells": "Ogniwa",
+    "showCardVersion": "Wersja"
   },
   "switches": {
     "charge": "Ładowanie",
