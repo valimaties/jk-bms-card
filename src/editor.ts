@@ -355,7 +355,7 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
             ${html`
                 <ha-expansion-panel outlined style="margin-top: 10px;">
                     <div slot="header" style="padding: 8px 16px; font-weight: 500;">
-                        ${localize('config.showShowHide')}
+                        ${localize('config.titleShowHide')}
                     </div>
                     <div style="padding: 16px; 
                                 display: grid; 

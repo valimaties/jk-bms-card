@@ -23,7 +23,7 @@
     "hasHeater": "是否有加热器",
     "socDecimals": "SOC 小数位数",
     "customDecimals": "自定义小数位",
-    "showShowHide": "显示 / 隐藏区域",
+    "titleShowHide": "显示 / 隐藏区域",
     "showTitle": "标题",
     "showButtons": "按钮",
     "showMain": "主面板",
