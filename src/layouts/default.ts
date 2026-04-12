@@ -248,11 +248,6 @@ export class JkBmsDefaultLayout extends LitElement {
         this.deltaV = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));
         const balanceCurrent = parseFloat(this.getState(EntityKey.balancing_current, 2, '0'));
         const powerNumber = parseFloat(this.getState(EntityKey.power, 2, '0'));
-        const triggerV = Number(this.getState(EntityKey.balance_trigger_voltage, 2, "", "number"));
-        const balance_starting_voltage = Number(this.getState(EntityKey.balance_starting_voltage, 3, "", "number"));
-        const min_cell_voltage = Number(this.getState(EntityKey.min_cell_voltage, 3, "", "number"));
-        const max_cell_voltage = Number(this.getState(EntityKey.max_cell_voltage, 3, "", "number"));
-        const balanceOnOff = this.getState(EntityKey.balancer, 0, '', 'switch');
 
         this.shouldBalance = balanceCurrent != 0; // this is enough
 
@@ -267,6 +262,28 @@ export class JkBmsDefaultLayout extends LitElement {
         const showMain = this.config.showMain;
         const showCells = this.config.showCells;
         const showCardVersion = this.config.showCardVersion;
+
+        this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
+        this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
+
+        const isValidCellId = (value: any): boolean => {
+            if (value == null) return false;                    
+            const num = Number(value);                          
+            return !isNaN(num) && isFinite(num) && num >= 0;   
+        };
+
+        const isValidDelta = (value: any): boolean => {
+            if (value == null) return false;
+            const num = Number(value);
+            return !isNaN(num) && isFinite(num) && num > 0;
+        };
+
+        const hasValidMinMax = isValidCellId(this.minCellId) && isValidCellId(this.maxCellId);
+        const hasValidDelta = isValidDelta(this.deltaV);
+
+        if (!hasValidMinMax || !hasValidDelta) {
+            this.calculateDynamicMinMaxCellId(this.config?.cellCount ?? 16);
+        }
 
         return html`
         <ha-card>
@@ -381,40 +398,6 @@ export class JkBmsDefaultLayout extends LitElement {
         const bankOffset = Math.floor(totalCells / columns);
         const end = bankmode ? Math.ceil(totalCells / columns) : totalCells;
         const uneven = totalCells % columns
-
-        this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
-        this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
-
-        const isValidCellId = (value: any): boolean => {
-            if (value == null) return false;                    
-            const num = Number(value);                          
-            return !isNaN(num) && isFinite(num) && num >= 0;   
-        };
-
-        const isValidDelta = (value: any): boolean => {
-            if (value == null) return false;
-            const num = Number(value);
-            return !isNaN(num) && isFinite(num) && num > 0;
-        };
-
-        const hasValidMinMax = isValidCellId(this.minCellId) && isValidCellId(this.maxCellId);
-        const hasValidDelta = isValidDelta(this.deltaV);
-
-        if (!hasValidMinMax || !hasValidDelta) {
-            //console.log('Default layout - minCellId and maxCellId are calculated dynamically!');
-            //console.log('DEBUG actual values:', {
-            //    minCellId: this.minCellId,
-            //    typeMin: typeof this.minCellId,
-            //    maxCellId: this.maxCellId,
-            //    typeMax: typeof this.maxCellId,
-            //    maxDeltaV: this.deltaV,
-            //    typeDelta: typeof this.deltaV,
-            //    hasValidMinMax,
-            //    hasValidDelta
-            //});
-
-            this.calculateDynamicMinMaxCellId(totalCells);
-        }
 
         for (let i = start; i <= end; i++) {
             if (bankmode && uneven && i == end) {

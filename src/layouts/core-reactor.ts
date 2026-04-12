@@ -693,6 +693,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
         this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
         this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
+        this.deltaV    = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));
 
         const isValidCellId = (value: any): boolean => {
             if (value == null) return false; 
@@ -710,18 +711,6 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const hasValidDelta = isValidDelta(this.deltaV);
 
         if (!hasValidMinMax || !hasValidDelta) {
-            //console.log('Default layout - minCellId and maxCellId are calculated dynamically!');
-            //console.log('DEBUG actual values:', {
-            //    minCellId: this.minCellId,
-            //    typeMin: typeof this.minCellId,
-            //    maxCellId: this.maxCellId,
-            //    typeMax: typeof this.maxCellId,
-            //    maxDeltaV: this.deltaV,
-            //    typeDelta: typeof this.deltaV,
-            //    hasValidMinMax,
-            //    hasValidDelta
-            //});
-
             this.calculateDynamicMinMax();
         } 
 
@@ -935,24 +924,16 @@ export class JkBmsCoreReactorLayout extends LitElement {
     }
 
     private getTemperatureColor(temp: number): string {
-        // Limite configurabile – ajustează după nevoile tale (ex. pentru baterie JK-BMS)
-        const cold = 5;     // sub asta → albastru rece / îngheț
-        const optimalLow = 15;
-        const optimalHigh = 35;
-        const hot = 45;     // peste asta → roșu intens / alarmă
-
-        // Culori de referință (hex)
         const colors = [
-            { temp: -10, color: '#0000FF' },   // deep blue (foarte rece)
-            { temp: 0,   color: '#00BFFF' },   // light blue / cyan rece
-            { temp: 20,  color: '#41CD52' },   // lime green (optim)
+            { temp: -10, color: '#0000FF' },   // deep blue
+            { temp: 0,   color: '#00BFFF' },   // light blue / cyan 
+            { temp: 20,  color: '#41CD52' },   // lime green
             { temp: 30,  color: '#FFD700' },   // gold/yellow
             { temp: 40,  color: '#FF8C00' },   // orange
             { temp: 50,  color: '#FF4500' },   // orangered
-            { temp: 60,  color: '#DC143C' },   // crimson (prea fierbinte)
+            { temp: 60,  color: '#DC143C' },   // crimson
         ];
 
-        // Găsește intervalul și interpolează
         for (let i = 0; i < colors.length - 1; i++) {
             const curr = colors[i];
             const next = colors[i + 1];
@@ -960,7 +941,6 @@ export class JkBmsCoreReactorLayout extends LitElement {
             if (temp <= curr.temp) return curr.color;
             if (temp >= next.temp) continue;
 
-            // Interpolare liniară între curr și next
             const ratio = (temp - curr.temp) / (next.temp - curr.temp);
             const r1 = parseInt(curr.color.slice(1,3), 16);
             const g1 = parseInt(curr.color.slice(3,5), 16);
@@ -976,7 +956,6 @@ export class JkBmsCoreReactorLayout extends LitElement {
             return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
         }
 
-        // Dacă e peste maxim → ultimul color (roșu intens)
         return colors[colors.length - 1].color;
     }
 
