@@ -33,9 +33,10 @@ export class JkBmsCard extends LitElement {
 
     static getStubConfig() {
         return {
-            language: '',
+            language: 'auto',
             title: localize("title"),
             prefix: "jk_bms",
+            batteryNumber: 1,
             cellCount: 16,
             cellColumns: 2,
             cellLayout: "bankMode",

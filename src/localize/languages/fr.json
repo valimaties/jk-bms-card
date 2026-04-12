@@ -8,6 +8,7 @@
     "language": "Langue",
     "title": "Titre",
     "prefix": "Préfixe des capteurs",
+    "batteryNumber": "Numéro de la batterie",
     "cellCount": "Nombre de cellules",
     "cellColumns": "Nombre de colonnes",
     "cellLayout": "Disposition des cellules",
@@ -53,6 +54,7 @@
     "temperature_sensor_4": "Temp. 4 :"
   },
   "html_texts": {
+    "batNumber": "N° Bat.",
     "capacity": "Capacité",
     "time": "Temps",
     "grid-solar": "Réseau/Solaire",

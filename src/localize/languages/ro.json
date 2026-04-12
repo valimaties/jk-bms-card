@@ -8,6 +8,7 @@
     "language": "Limba",
     "title": "Titlu",
     "prefix": "Prefixul senzorilor",
+    "batteryNumber": "Numărul bateriei",
     "cellCount": "Număr de celule",
     "cellColumns": "Număr de coloane",
     "cellLayout": "Aranjament celule",
@@ -53,6 +54,7 @@
     "temperature_sensor_4": "Temp. 4:"
   },
   "html_texts": {
+    "batNumber": "Bat.",
     "capacity": "Capacitate",
     "time": "Timp",
     "grid-solar": "Rețea/Solar",

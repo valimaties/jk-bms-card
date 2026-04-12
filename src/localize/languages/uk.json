@@ -8,6 +8,7 @@
     "language": "Мова",
     "title": "Заголовок",
     "prefix": "Префікс сенсорів",
+    "batteryNumber": "Номер батареї",
     "cellCount": "Кількість комірок",
     "cellColumns": "Кількість стовпців",
     "cellLayout": "Розташування комірок",
@@ -53,6 +54,7 @@
     "temperature_sensor_4": "Темп. 4:"
   },
   "html_texts": {
+    "batNumber": "Бат.",
     "capacity": "Ємність",
     "time": "Час",
     "grid-solar": "Мережа/Сонячна",

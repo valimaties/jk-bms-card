@@ -15,7 +15,7 @@ export class JkBmsDefaultLayout extends LitElement {
 
     minCellId: string = '';
     maxCellId: string = '';
-    maxDeltaV: number = 0.000;
+    deltaV: number = 0.000;
     shouldBalance: boolean = false;
     VERSION = version;
 
@@ -239,19 +239,15 @@ export class JkBmsDefaultLayout extends LitElement {
         const softwareVersion = this.getState(EntityKey.software_version);
         const runtime = this.getState(EntityKey.total_runtime_formatted);
         const header = runtime && runtime != "unknown" ? html`${localize('html_texts.time')}: <b><font color="#3090C7">${runtime.toUpperCase()}</font></b>` : ''
+        const batNum = this.config.batteryNumber || 1;
 
         const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
-            html`Bat 1 - ${localize('html_texts.capacity')}: <b> ${this.getState(EntityKey.total_battery_capacity_setting)} Ah</b></br>
+            html`${localize('html_texts.batNumber')} ${batNum} - ${localize('html_texts.capacity')}: <b> ${this.getState(EntityKey.total_battery_capacity_setting)} Ah</b></br>
                 HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b> | ${header}`;
 
-        this.maxDeltaV = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));
+        this.deltaV = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));
         const balanceCurrent = parseFloat(this.getState(EntityKey.balancing_current, 2, '0'));
         const powerNumber = parseFloat(this.getState(EntityKey.power, 2, '0'));
-        const triggerV = Number(this.getState(EntityKey.balance_trigger_voltage, 2, "", "number"));
-        const balance_starting_voltage = Number(this.getState(EntityKey.balance_starting_voltage, 3, "", "number"));
-        const min_cell_voltage = Number(this.getState(EntityKey.min_cell_voltage, 3, "", "number"));
-        const max_cell_voltage = Number(this.getState(EntityKey.max_cell_voltage, 3, "", "number"));
-        const balanceOnOff = this.getState(EntityKey.balancer, 0, '', 'switch');
 
         this.shouldBalance = balanceCurrent != 0; // this is enough
 
@@ -266,6 +262,28 @@ export class JkBmsDefaultLayout extends LitElement {
         const showMain = this.config.showMain;
         const showCells = this.config.showCells;
         const showCardVersion = this.config.showCardVersion;
+
+        this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
+        this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
+
+        const isValidCellId = (value: any): boolean => {
+            if (value == null) return false;                    
+            const num = Number(value);                          
+            return !isNaN(num) && isFinite(num) && num >= 0;   
+        };
+
+        const isValidDelta = (value: any): boolean => {
+            if (value == null) return false;
+            const num = Number(value);
+            return !isNaN(num) && isFinite(num) && num > 0;
+        };
+
+        const hasValidMinMax = isValidCellId(this.minCellId) && isValidCellId(this.maxCellId);
+        const hasValidDelta = isValidDelta(this.deltaV);
+
+        if (!hasValidMinMax || !hasValidDelta) {
+            this.calculateDynamicMinMaxCellId(this.config?.cellCount ?? 16);
+        }
 
         return html`
         <ha-card>
@@ -309,7 +327,7 @@ export class JkBmsDefaultLayout extends LitElement {
                     ${localize('stats.stateOfCharge')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>${this.getState(EntityKey.state_of_charge, socDecimals)} %</span><br>
                     ${localize('stats.remainingAmps')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>${this.getState(EntityKey.capacity_remaining, customDecimals)} Ah</span><br>
                     ${localize('stats.cycles')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.charging_cycles)}>${this.getState(EntityKey.charging_cycles, customDecimals)}</span><br>
-                    ${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.maxDeltaV)} </span><br>
+                    ${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.deltaV)} </span><br>
                     ${EntityKey.max_cell_voltage && this.getState(EntityKey.max_cell_voltage) != '' ? html`${localize('stats.maxCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.max_cell_voltage)}>${this.getState(EntityKey.max_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>` : ''}
                     ${localize('stats.mosfetTemp')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${this.getState(EntityKey.power_tube_temperature)} °C</span>
                     ${this._renderTemps(2)}
@@ -381,13 +399,6 @@ export class JkBmsDefaultLayout extends LitElement {
         const end = bankmode ? Math.ceil(totalCells / columns) : totalCells;
         const uneven = totalCells % columns
 
-        this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
-        this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
-
-        if (!this.minCellId || !this.maxCellId || !this.maxDeltaV || this.maxDeltaV == 0) {
-            this.calculateDynamicMinMaxCellId(totalCells)
-        }
-
         for (let i = start; i <= end; i++) {
             if (bankmode && uneven && i == end) {
                 cells.push(this._createCell(totalCells));
@@ -430,7 +441,7 @@ export class JkBmsDefaultLayout extends LitElement {
 
         this.minCellId = String(minId);
         this.maxCellId = String(maxId);
-        this.maxDeltaV = Number((maxVoltage - minVoltage).toFixed(3));
+        this.deltaV = Number((maxVoltage - minVoltage).toFixed(3));
     }
 
     private _createCell(i) {

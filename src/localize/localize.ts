@@ -22,12 +22,7 @@ const languages: any = {
 };
 
 export function localize(string: string, search = '', replace = '') {
-  try {
-    // localStorage.getItem('selectedLanguage') == null // but the system is set to Ukrainian, WTF?
-    // localStorage.getItem('assist_debug_language') == "\"uk\"" // Ukraine, its ok.
-    // localStorage.getItem('editor-language') == "ru" // but the system is set to Ukrainian, WTF?
-    //
-    
+  try {    
     let forcedLang = (globalData as { cardConfig?: { language?: string } }).cardConfig?.language;
 
     let langFromLocalStorage = localStorage.getItem('selectedLanguage');

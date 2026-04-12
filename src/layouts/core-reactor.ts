@@ -15,7 +15,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
     minCellId: string = '';
     maxCellId: string = '';
-    maxDeltaV: number = 0.000;
+    deltaV: number = 0.000;
     shouldBalance: boolean = false;
     tempSensorsCount: number = 0;
     VERSION = version;
@@ -658,8 +658,9 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const capacityVal = this.getState(EntityKey.total_battery_capacity_setting, customDecimals);
         const runtime = this.getState(EntityKey.total_runtime_formatted);
         const header = runtime && runtime != "unknown" ? html` | ${localize('html_texts.time')}: <b>${runtime.toUpperCase()}</b>` : '';
+        const batNum = this.config.batteryNumber || 1;
         const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
-                        html`Bat 1 - ${localize('html_texts.capacity')}: <b>${capacityVal} Ah</b></br>
+                        html`${localize('html_texts.batNumber')} ${batNum} - ${localize('html_texts.capacity')}: <b>${capacityVal} Ah</b></br>
         HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b>${header}`;
 
         const current = parseFloat(this.getState(EntityKey.current));
@@ -690,7 +691,28 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const showCells = this.config.showCells;
         const showCardVersion = this.config.showCardVersion;
 
-        this.calculateDynamicMinMax();
+        this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
+        this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
+        this.deltaV    = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));
+
+        const isValidCellId = (value: any): boolean => {
+            if (value == null) return false; 
+            const num = Number(value);
+            return !isNaN(num) && isFinite(num) && num >= 0;
+        };
+
+        const isValidDelta = (value: any): boolean => {
+            if (value == null) return false;
+            const num = Number(value);
+            return !isNaN(num) && isFinite(num) && num > 0;
+        };
+
+        const hasValidMinMax = isValidCellId(this.minCellId) && isValidCellId(this.maxCellId);
+        const hasValidDelta = isValidDelta(this.deltaV);
+
+        if (!hasValidMinMax || !hasValidDelta) {
+            this.calculateDynamicMinMax();
+        } 
 
         return html`
             <ha-card class="container">
@@ -812,7 +834,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                             <div class="stat-label">${localize('html_texts.delta')} ${this.config.deltaVoltageUnit || localize('html_texts.volt')}:</div>
                             <div class="stat-value val-green clickable"
                                  @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}>
-                                ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.maxDeltaV)}
+                                ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.deltaV)}
                             </div>
                         </div>
                     </div>
@@ -891,35 +913,27 @@ export class JkBmsCoreReactorLayout extends LitElement {
         }
 
         if (minV === Infinity || maxV === -Infinity) {
-            this.maxDeltaV = 0;
+            this.deltaV = 0;
             this.minCellId = '';
             this.maxCellId = '';
         } else {
             this.minCellId = minId;
             this.maxCellId = maxId;
-            this.maxDeltaV = parseFloat((maxV - minV).toFixed(3));
+            this.deltaV = parseFloat((maxV - minV).toFixed(3));
         }
     }
 
     private getTemperatureColor(temp: number): string {
-        // Limite configurabile – ajustează după nevoile tale (ex. pentru baterie JK-BMS)
-        const cold = 5;     // sub asta → albastru rece / îngheț
-        const optimalLow = 15;
-        const optimalHigh = 35;
-        const hot = 45;     // peste asta → roșu intens / alarmă
-
-        // Culori de referință (hex)
         const colors = [
-            { temp: -10, color: '#0000FF' },   // deep blue (foarte rece)
-            { temp: 0,   color: '#00BFFF' },   // light blue / cyan rece
-            { temp: 20,  color: '#41CD52' },   // lime green (optim)
+            { temp: -10, color: '#0000FF' },   // deep blue
+            { temp: 0,   color: '#00BFFF' },   // light blue / cyan 
+            { temp: 20,  color: '#41CD52' },   // lime green
             { temp: 30,  color: '#FFD700' },   // gold/yellow
             { temp: 40,  color: '#FF8C00' },   // orange
             { temp: 50,  color: '#FF4500' },   // orangered
-            { temp: 60,  color: '#DC143C' },   // crimson (prea fierbinte)
+            { temp: 60,  color: '#DC143C' },   // crimson
         ];
 
-        // Găsește intervalul și interpolează
         for (let i = 0; i < colors.length - 1; i++) {
             const curr = colors[i];
             const next = colors[i + 1];
@@ -927,7 +941,6 @@ export class JkBmsCoreReactorLayout extends LitElement {
             if (temp <= curr.temp) return curr.color;
             if (temp >= next.temp) continue;
 
-            // Interpolare liniară între curr și next
             const ratio = (temp - curr.temp) / (next.temp - curr.temp);
             const r1 = parseInt(curr.color.slice(1,3), 16);
             const g1 = parseInt(curr.color.slice(3,5), 16);
@@ -943,7 +956,6 @@ export class JkBmsCoreReactorLayout extends LitElement {
             return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
         }
 
-        // Dacă e peste maxim → ultimul color (roșu intens)
         return colors[colors.length - 1].color;
     }
 
