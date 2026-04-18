@@ -714,6 +714,8 @@ export class JkBmsCoreReactorLayout extends LitElement {
             this.calculateDynamicMinMax();
         } 
 
+        const showMainStats = this.config.showMainStats;
+
         return html`
             <ha-card class="container">
                 ${showTitle ? html`
@@ -801,6 +803,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                 </div>    
                 
                 <!-- Stats Panels -->
+                ${showMainStats ? html`
                 <div class="middle-grid">
                     <div class="stats-panel">
                         <div class="metric-group">
@@ -870,7 +873,9 @@ export class JkBmsCoreReactorLayout extends LitElement {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>    
+                    ` : html``}
+                
                 ` : html``}
                 
                 <!-- Cells -->

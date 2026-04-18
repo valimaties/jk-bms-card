@@ -23,9 +23,11 @@
     "hasHeater": "Heizungs-Option wird verwendet",
     "socDecimals": "SOC Dezimalstellen",
     "customDecimals": "Benutzerdefinierte Dezimalzahlen",
+    "titleShowHide": "Zonen ein-/ausblenden",
     "showTitle": "Titel",
     "showButtons": "Schaltfl.",
     "showMain": "Hauptteil",
+    "showMainStats": "Stats",
     "showCells": "Zellen",
     "showCardVersion": "Kartenvers."
   },

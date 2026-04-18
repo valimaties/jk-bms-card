@@ -23,9 +23,11 @@
     "hasHeater": "是否有加热器",
     "socDecimals": "SOC 小数位数",
     "customDecimals": "自定义小数位",
+    "titleShowHide": "显示 / 隐藏区域",
     "showTitle": "标题",
     "showButtons": "按钮",
     "showMain": "主面板",
+    "showMainStats": "统计",
     "showCells": "电池",
     "showCardVersion": "版本"
   },

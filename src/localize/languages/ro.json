@@ -23,11 +23,13 @@
     "hasHeater": "Opțiunea încălzitor este utilizată",
     "socDecimals": "Zecimale SoC",
     "customDecimals": "Zecimale alte controale",
-    "showTitle": "Afișează Titlul",
-    "showButtons": "Afișează Butoane",
-    "showMain": "Afișează Main",
-    "showCells": "Afișează Celule",
-    "showCardVersion": "Afișează Versiune Card"
+    "titleShowHide": "Afișează / Ascunde zone",
+    "showTitle": "Titlul",
+    "showButtons": "Butoane",
+    "showMain": "Principală",
+    "showMainStats": "Stat.",
+    "showCells": "Celule",
+    "showCardVersion": "Versiune"
   },
   "switches": {
     "charge": "Încărcare",

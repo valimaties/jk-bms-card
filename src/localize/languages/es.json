@@ -23,9 +23,11 @@
     "hasHeater": "Opción de calefactor activada",
     "socDecimals": "Decimales de SOC",
     "customDecimals": "Decimales personalizados",
+    "titleShowHide": "Mostrar / Ocultar zonas",
     "showTitle": "Título",
     "showButtons": "Botones",
     "showMain": "Principal",
+    "showMainStats": "Stats",
     "showCells": "Celdas",
     "showCardVersion": "Versión"
   },
