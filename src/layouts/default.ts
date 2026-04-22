@@ -267,7 +267,7 @@ export class JkBmsDefaultLayout extends LitElement {
         this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
 
         const isValidCellId = (value: any): boolean => {
-            if (value == null) return false;                    
+            if (value == null || value === "") return false;                    
             const num = Number(value);                          
             return !isNaN(num) && isFinite(num) && num >= 0;   
         };

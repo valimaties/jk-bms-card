@@ -696,7 +696,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         this.deltaV    = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));
 
         const isValidCellId = (value: any): boolean => {
-            if (value == null) return false; 
+            if (value == null || value === "") return false; 
             const num = Number(value);
             return !isNaN(num) && isFinite(num) && num >= 0;
         };
@@ -898,8 +898,8 @@ export class JkBmsCoreReactorLayout extends LitElement {
         // Logic reused/adapted from default layout to find min/max cell for highlighting
         let minV = Infinity;
         let maxV = -Infinity;
-        let minId = '';
-        let maxId = '';
+        let minId = -1;
+        let maxId = -1;
         const count = this.config.cellCount || 16;
 
         for (let i = 1; i <= count; i++) {
@@ -908,11 +908,11 @@ export class JkBmsCoreReactorLayout extends LitElement {
             if (!isNaN(v)) {
                 if (v < minV) {
                     minV = v;
-                    minId = String(i);
+                    minId = i;
                 }
                 if (v > maxV) {
                     maxV = v;
-                    maxId = String(i);
+                    maxId = i;
                 }
             }
         }
@@ -922,8 +922,8 @@ export class JkBmsCoreReactorLayout extends LitElement {
             this.minCellId = '';
             this.maxCellId = '';
         } else {
-            this.minCellId = minId;
-            this.maxCellId = maxId;
+            this.minCellId = minId.toString();
+            this.maxCellId = maxId.toString();
             this.deltaV = parseFloat((maxV - minV).toFixed(3));
         }
     }
@@ -1055,7 +1055,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         // Highlight logic
         const isMin = String(i) === this.minCellId;
         const isMax = String(i) === this.maxCellId;
-        let valClass = isMin ? 'cell-low' : isMax ? 'cell-high' : 'val-white';
+        let valClass = isMin ? 'cell-low' : (isMax ? 'cell-high' : 'val-white');
 
         // Custom pill background if needed for highlighting min/max row?
         // For now just standard
