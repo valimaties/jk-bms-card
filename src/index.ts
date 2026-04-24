@@ -40,6 +40,8 @@ export class JkBmsCard extends LitElement {
             cellCount: 16,
             cellColumns: 2,
             cellLayout: "bankMode",
+            deltaVoltageUnit: 'V',
+            resistanceUnit: 'Ω',
             tempSensorsCount: 0,
             hasHeater: 0,
             socDecimals: 2,

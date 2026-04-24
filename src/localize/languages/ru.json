@@ -14,6 +14,7 @@
     "cellLayout": "Расположение ячеек",
     "layout": "Макет",
     "deltaVoltageUnit": "Единица дельта-напряжения",
+    "resistanceUnit": "Единица измерения сопротивления",
     "cellColorMode": "Режим цвета ячеек",
     "cellOrientation": "Ориентация ячеек",
     "minCellVoltage": "Мин. напряжение ячейки (В)",

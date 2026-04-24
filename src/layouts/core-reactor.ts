@@ -4,7 +4,7 @@ import { HomeAssistant } from 'custom-card-helpers';
 import { EntityKey } from '../const';
 import { JkBmsCardConfig } from '../interfaces';
 import { globalData } from '../helpers/globals';
-import { configOrEnum, formatDeltaVoltage, getState, navigate } from '../helpers/utils';
+import { configOrEnum, formatValue, getState, getUnit, navigate } from '../helpers/utils';
 import { localize } from '../localize/localize';
 import {version} from '../../package.json';
 
@@ -50,10 +50,9 @@ export class JkBmsCoreReactorLayout extends LitElement {
             color: var(--secondary-text-color);
         }
 
-        .header b {
+        .header span {
             color: var(--discharge-color);
         }
-
         /* Top Section: Flow & Reactor */
 
         .top-section {
@@ -209,7 +208,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
             display: grid;
             grid-template-columns: auto 1fr;
             align-items: center;
-            gap: 12px; 
+            gap: 8px; 
             width: 100%;
         }
 
@@ -217,8 +216,8 @@ export class JkBmsCoreReactorLayout extends LitElement {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 30px;
+            height: 30px;
             justify-self: start;
         }
 
@@ -645,6 +644,10 @@ export class JkBmsCoreReactorLayout extends LitElement {
         return getState(this.hass, this.config, entityKey, precision, defaultValue, type);
     }
 
+    private getUnit(entityKey: EntityKey): string{
+        return getUnit(this.hass, this.config, entityKey);
+    }
+
     protected render() {
         globalData.hass = this.hass;
         if (!this.hass || !this.config) return html``;
@@ -657,7 +660,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const softwareVersion = this.getState(EntityKey.software_version);
         const capacityVal = this.getState(EntityKey.total_battery_capacity_setting, customDecimals);
         const runtime = this.getState(EntityKey.total_runtime_formatted);
-        const header = runtime && runtime != "unknown" ? html` | ${localize('html_texts.time')}: <b>${runtime.toUpperCase()}</b>` : '';
+        const header = runtime && runtime != "unknown" ? html` | ${localize('html_texts.time')}: <span>${runtime.toUpperCase()}</span>` : '';
         const batNum = this.config.batteryNumber || 1;
         const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
                         html`${localize('html_texts.batNumber')} ${batNum} - ${localize('html_texts.capacity')}: <b>${capacityVal} Ah</b></br>
@@ -681,6 +684,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         // Stats
         const totalVolts = this.getState(EntityKey.total_voltage);
         const mosTemp = this.getState(EntityKey.power_tube_temperature);
+        const mosTempUnit = this.getUnit(EntityKey.power_tube_temperature);
         const totalChargingCycleCapacity = this.getState(EntityKey.total_charging_cycle_capacity, customDecimals);
         const chargingCycles = parseFloat(this.getState(EntityKey.charging_cycles)).toFixed(0).toString();
 
@@ -828,7 +832,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                             ${this._renderSparkline(EntityKey.power_tube_temperature, '#FFA500')}
                             <div class="stat-label">${localize('html_texts.mosfetTemp')}:</div>
                             <div class="stat-value val-white clickable"
-                                 @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${mosTemp} °C
+                                 @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${mosTemp} ${mosTempUnit}
                             </div>
                         </div>
 
@@ -837,7 +841,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                             <div class="stat-label">${localize('html_texts.delta')} ${this.config.deltaVoltageUnit || localize('html_texts.volt')}:</div>
                             <div class="stat-value val-green clickable"
                                  @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}>
-                                ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.deltaV)}
+                                ${formatValue(this.getUnit(EntityKey.delta_cell_voltage), this.config.deltaVoltageUnit ?? 'V', this.deltaV)}
                             </div>
                         </div>
                     </div>
@@ -976,6 +980,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
         const renderSensor = (sensorKey: EntityKey, number: number) => {
             const tempStr = this.getState(sensorKey, 1, '—');
+            const tempUnit = this.getUnit(sensorKey);
             const tempVal = parseFloat(tempStr);
             const color = isNaN(tempVal)
                 ? '#777777'
@@ -990,7 +995,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                     <div class="stat-value clickable"
                         style="color: ${color};"
                         @click=${(e) => this._navigate(e, sensorKey)}>
-                        ${tempStr} °C
+                        ${tempStr} ${tempUnit}
                     </div>
                 </div>
             `;
@@ -1050,6 +1055,8 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
     private _renderSingleCell(cells: TemplateResult[], i: number): void {
         const v = this.getState(EntityKey[`cell_voltage_${i}`] as EntityKey, 3, '0.000');
+        const rU = this.getUnit(EntityKey[`cell_resistance_${i}`] as EntityKey) ?? 'Ω';
+        const resUnit = this.config?.resistanceUnit ?? rU;
         const r = this.getState(EntityKey[`cell_resistance_${i}`] as EntityKey, 3, '0.000');
 
         // Highlight logic
@@ -1073,6 +1080,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
         const rParam = parseFloat(r);
         const showResistance = !isNaN(rParam) && rParam > 0;
+        const rWithUnit = formatValue(rU, resUnit, rParam);
 
         const colorMode = this.config.cellColorMode || 'progress';
         let cellStyle = '';
@@ -1115,7 +1123,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                           @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`] as EntityKey)}>${v} ${localize('html_texts.volt')}</span>
                     ${showResistance ? html`
                         <span class="cell-res clickable" style="${textBgStyle}"
-                              @click=${(e) => this._navigate(e, EntityKey[`cell_resistance_${i}`] as EntityKey)}>${r} Ω</span>
+                              @click=${(e) => this._navigate(e, EntityKey[`cell_resistance_${i}`] as EntityKey)}>${rWithUnit}</span>
                     ` : ''}
                 ` : html`
                     <span class="clickable"
@@ -1125,7 +1133,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                         </span>
                     ${showResistance ? html`
                         <span class="cell-res clickable" style="${textBgStyle}"
-                              @click=${(e) => this._navigate(e, EntityKey[`cell_resistance_${i}`] as EntityKey)}>/ ${r} Ω</span>
+                              @click=${(e) => this._navigate(e, EntityKey[`cell_resistance_${i}`] as EntityKey)}> ${rWithUnit}</span>
                     ` : ''}
                 `}
             </div>
