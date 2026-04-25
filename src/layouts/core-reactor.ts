@@ -934,9 +934,11 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
     private getTemperatureColor(temp: number, unit: string = '°C'): string {
         //normalize to Celsius
-        if (unit === '°F') {
+        const isFahrenheit = unit === '°F' || unit === 'F';
+
+        if (isFahrenheit) {
             temp = (temp - 32) * 5 / 9;
-        }       
+        }      
 
         const colors = [
             { temp: -10, color: '#0000FF' },   // deep blue
