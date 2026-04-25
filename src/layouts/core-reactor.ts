@@ -932,7 +932,12 @@ export class JkBmsCoreReactorLayout extends LitElement {
         }
     }
 
-    private getTemperatureColor(temp: number): string {
+    private getTemperatureColor(temp: number, unit: string = '°C'): string {
+        //normalize to Celsius
+        if (unit === '°F') {
+            temp = (temp - 32) * 5 / 9;
+        }       
+
         const colors = [
             { temp: -10, color: '#0000FF' },   // deep blue
             { temp: 0,   color: '#00BFFF' },   // light blue / cyan 
@@ -980,11 +985,11 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
         const renderSensor = (sensorKey: EntityKey, number: number) => {
             const tempStr = this.getState(sensorKey, 1, '—');
-            const tempUnit = this.getUnit(sensorKey);
+            const tempUnit = this.getUnit(sensorKey) || '°C';
             const tempVal = parseFloat(tempStr);
             const color = isNaN(tempVal)
                 ? '#777777'
-                : this.getTemperatureColor(tempVal);
+                : this.getTemperatureColor(tempVal, tempUnit);
 
             return html`
                 <div class="metric-group">
