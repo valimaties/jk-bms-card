@@ -5,8 +5,8 @@ import { EntityKey } from '../const';
 import { JkBmsCardConfig } from '../interfaces';
 import { localize } from '../localize/localize';
 import { globalData } from '../helpers/globals';
-import {navigate, getState, configOrEnum, formatDeltaVoltage} from '../helpers/utils';
-import {version} from '../../package.json';
+import { navigate, getState, getUnit, configOrEnum, formatValue } from '../helpers/utils';
+import { version } from '../../package.json';
 
 @customElement('jk-bms-default-layout')
 export class JkBmsDefaultLayout extends LitElement {
@@ -217,6 +217,10 @@ export class JkBmsDefaultLayout extends LitElement {
         return getState(this.hass, this.config, entityKey, precision, defaultValue, type);
     }
 
+    private getUnit(entityKey: EntityKey): string {
+        return getUnit(this.hass, this.config, entityKey);
+    }
+
     private _renderSwitch(entityId: EntityKey, label: string): TemplateResult {
         const state = this.getState(entityId, 0, '', "switch");
         const colorClass = state === 'on' ? 'status-on' : 'status-off';
@@ -327,9 +331,9 @@ export class JkBmsDefaultLayout extends LitElement {
                     ${localize('stats.stateOfCharge')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>${this.getState(EntityKey.state_of_charge, socDecimals)} %</span><br>
                     ${localize('stats.remainingAmps')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>${this.getState(EntityKey.capacity_remaining, customDecimals)} Ah</span><br>
                     ${localize('stats.cycles')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.charging_cycles)}>${this.getState(EntityKey.charging_cycles, customDecimals)}</span><br>
-                    ${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatDeltaVoltage(this.config.deltaVoltageUnit, this.deltaV)} </span><br>
+                    ${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatValue(this.getUnit(EntityKey.delta_cell_voltage) ?? 'V', this.config.deltaVoltageUnit ?? 'V', this.deltaV)} </span><br>
                     ${EntityKey.max_cell_voltage && this.getState(EntityKey.max_cell_voltage) != '' ? html`${localize('stats.maxCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.max_cell_voltage)}>${this.getState(EntityKey.max_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>` : ''}
-                    ${localize('stats.mosfetTemp')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${this.getState(EntityKey.power_tube_temperature)} °C</span>
+                    ${localize('stats.mosfetTemp')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${this.getState(EntityKey.power_tube_temperature)} ${this.getUnit(EntityKey.power_tube_temperature)}</span>
                     ${this._renderTemps(2)}
                 </div>
             </div>
@@ -383,7 +387,7 @@ export class JkBmsDefaultLayout extends LitElement {
         const sensorsCount = this.config?.tempSensorsCount ?? 0;
         for (let i = placement; i <= sensorsCount; i += 2) {
             sensors.push(html`
-                <br>${localize('stats.temperature_sensor_' + i)} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey['temperature_sensor_' + i])}>${this.getState(EntityKey['temperature_sensor_' + i])} °C</span>`);
+                <br>${localize('stats.temperature_sensor_' + i)} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey['temperature_sensor_' + i])}>${this.getState(EntityKey['temperature_sensor_' + i])} ${this.getUnit(EntityKey['temperature_sensor_' + i])}</span>`);
         }
 
         return html`${sensors}`;
@@ -446,7 +450,9 @@ export class JkBmsDefaultLayout extends LitElement {
 
     private _createCell(i) {
         const voltage = this.getState(EntityKey[`cell_voltage_${i}`], 3, '0.0');
-        const resistance = this.getState(EntityKey[`cell_resistance_${i}`], 3);
+        const res = this.getUnit(EntityKey[`cell_resistance_${i}`]) ?? 'Ω'; // get original unit of resistance sensor, fallback to Ω
+        const resUnit = this.config?.resistanceUnit ?? res; // get resistance from config, fallback to original unit
+        const resistance = formatValue(res, resUnit, this.getState(EntityKey[`cell_resistance_${i}`], 3));
         const minCell = this.minCellId;
         const maxCell = this.maxCellId;
 
@@ -456,7 +462,7 @@ export class JkBmsDefaultLayout extends LitElement {
 
         let resistanceHtml = resistance == '' ? '' : html`
             <span class="clickable" @click=${(e) => this._navigate(e, EntityKey[`cell_resistance_${i}`])}>
-            / ${resistance} Ω
+            / ${resistance}
           </span>`
 
         return html`
@@ -469,6 +475,7 @@ export class JkBmsDefaultLayout extends LitElement {
             </div>
         `;
     }
+
     private _updateFlowLine() {
         const balanceCurrent = parseFloat(this.getState(EntityKey.balancing_current, 3, '0'));
 

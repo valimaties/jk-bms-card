@@ -14,6 +14,7 @@
     "cellLayout": "Układ ogniw",
     "layout": "Układ",
     "deltaVoltageUnit": "Jednostka różnicy napięcia",
+    "resistanceUnit": "Jednostka miary rezystancji",
     "cellColorMode": "Tryb koloru ogniw",
     "cellOrientation": "Orientacja ogniw",
     "minCellVoltage": "Minimalne napięcie ogniwa (V)",

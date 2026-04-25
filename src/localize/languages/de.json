@@ -14,6 +14,7 @@
     "cellLayout": "Zellen-Layout",
     "layout": "Layout",
     "deltaVoltageUnit": "Einheit der Spannungsdifferenz",
+    "resistanceUnit": "Einheit des elektrischen Widerstands",
     "cellColorMode": "Zellen-Farbmodus",
     "cellOrientation": "Zellen-Ausrichtung",
     "minCellVoltage": "Min. Zellspannung (V)",

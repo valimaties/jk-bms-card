@@ -230,9 +230,18 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                                             ]
                                         }
                                     }
-                                },
-                                { name: 'minCellVoltage', selector: { number: { min: 2.0, max: 4.0, step: 0.01, mode: 'box' } } },
-                                
+                                },                                
+                                {
+                                    name: 'resistanceUnit',
+                                    selector: {
+                                        select: {
+                                            options: [
+                                                { label: 'Ohms (Ω)', value: 'Ω' },
+                                                { label: 'MilliOhms (mΩ)', value: 'mΩ' }
+                                            ]
+                                        }
+                                    }
+                                },                                
                             ],
                         },
                         {
@@ -261,6 +270,18 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                                         }
                                     }
                                 },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    type: 'grid',
+                    schema: [
+                        {
+                            type: 'grid',
+                            column_min_width: '200px',
+                            schema: [
+                                { name: 'minCellVoltage', selector: { number: { min: 2.0, max: 4.0, step: 0.01, mode: 'box' } } },
                                 { name: 'maxCellVoltage', selector: { number: { min: 2.0, max: 4.0, step: 0.01, mode: 'box' } } },
                             ],
                         },

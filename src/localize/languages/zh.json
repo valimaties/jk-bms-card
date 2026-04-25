@@ -14,6 +14,7 @@
     "cellLayout": "电芯布局方式",
     "layout": "布局",
     "deltaVoltageUnit": "电压差单位",
+    "resistanceUnit": "电阻单位",
     "cellColorMode": "电池颜色模式",
     "cellOrientation": "电池方向",
     "minCellVoltage": "最小电池电压 (V)",
