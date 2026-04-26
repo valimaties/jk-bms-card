@@ -81,6 +81,7 @@ export class JkBmsDefaultLayout extends LitElement {
 
         .data-row.split {
             justify-content: space-between;
+            margin-right: 4px;
         }
 
         .power-negative {
