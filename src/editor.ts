@@ -197,7 +197,7 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                             column_min_width: '200px',
                             schema: [
                                 { name: 'prefix', selector: { text: {} } },
-                                { name: 'batteryNumber', selector: { number: { min: 1, max: 16, step: 1, mode: 'box' } } },
+                                { name: 'batteryName', selector: { text: {} } },
                             ],
                         },
                     ],
@@ -388,7 +388,9 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                             ? this.renderBoolean(localize('config.showButtons'), 'showButtons')
                             : ''}
                         ${this.renderBoolean(localize('config.showMain'), 'showMain')}
-
+                        ${(this._config?.showMain === true && this._config?.layout === 'default')
+                            ? this.renderBoolean(localize('config.showCondensed'), 'showCondensed')
+                            : ''}
                         ${this._config?.showMain === true && this._config?.layout === 'core-reactor'
                             ? this.renderBoolean(localize('config.showMainStats'), 'showMainStats')
                             : ''}

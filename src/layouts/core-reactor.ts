@@ -442,6 +442,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         
         .cardVersion {
             text-align: right;
+            margin-right: 5px;
         }
         
         .version {
@@ -661,9 +662,9 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const capacityVal = this.getState(EntityKey.total_battery_capacity_setting, customDecimals);
         const runtime = this.getState(EntityKey.total_runtime_formatted);
         const header = runtime && runtime != "unknown" ? html` | ${localize('html_texts.time')}: <span>${runtime.toUpperCase()}</span>` : '';
-        const batNum = this.config.batteryNumber || 1;
+        const batName = this.config.batteryName || '';
         const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
-                        html`${localize('html_texts.batNumber')} ${batNum} - ${localize('html_texts.capacity')}: <b>${capacityVal} Ah</b></br>
+                        html`${batName === '' ? '' : batName + ' | ' }${localize('html_texts.capacity')}: <b>${capacityVal} Ah</b></br>
         HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b>${header}`;
 
         const current = parseFloat(this.getState(EntityKey.current));

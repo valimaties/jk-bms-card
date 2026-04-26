@@ -72,6 +72,16 @@ export class JkBmsDefaultLayout extends LitElement {
             padding-top: 0.75rem;
             padding-left: 0.75rem;
         }
+        
+        .data-row {
+            display: flex;
+            justify-content: flex-start;
+            gap: 4px;
+        }
+
+        .data-row.split {
+            justify-content: space-between;
+        }
 
         .power-negative {
             color: red
@@ -192,6 +202,7 @@ export class JkBmsDefaultLayout extends LitElement {
 
         .cardVersion {
             text-align: right;
+            margin-right: 5px;
         }
         
         .version {
@@ -243,10 +254,10 @@ export class JkBmsDefaultLayout extends LitElement {
         const softwareVersion = this.getState(EntityKey.software_version);
         const runtime = this.getState(EntityKey.total_runtime_formatted);
         const header = runtime && runtime != "unknown" ? html`${localize('html_texts.time')}: <b><font color="#3090C7">${runtime.toUpperCase()}</font></b>` : ''
-        const batNum = this.config.batteryNumber || 1;
+        const batName = this.config.batteryName || '';
 
         const title = (this.config.title && this.config.title.toLocaleLowerCase() != localize('config.title').toLocaleLowerCase()) ? this.config.title : 
-            html`${localize('html_texts.batNumber')} ${batNum} - ${localize('html_texts.capacity')}: <b> ${this.getState(EntityKey.total_battery_capacity_setting)} Ah</b></br>
+            html`${batName === '' ? '' : batName + ' | ' }${localize('html_texts.capacity')}: <b> ${this.getState(EntityKey.total_battery_capacity_setting)} Ah</b></br>
                 HW: <b>${hardwareVersion}</b> | SW: <b>${softwareVersion}</b> | ${header}`;
 
         this.deltaV = parseFloat(this.getState(EntityKey.delta_cell_voltage, 3, '0'));
@@ -264,8 +275,11 @@ export class JkBmsDefaultLayout extends LitElement {
         const showTitle = this.config.showTitle;
         const showButtons = this.config.showButtons;
         const showMain = this.config.showMain;
+        const showCondensed = this.config.showCondensed;
         const showCells = this.config.showCells;
         const showCardVersion = this.config.showCardVersion;
+
+        const rowClass = showCondensed ? 'data-row' : 'data-row split';
 
         this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
         this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
@@ -306,7 +320,6 @@ export class JkBmsDefaultLayout extends LitElement {
             </div>    
             ` : html``}
             
-            
             ${this._renderError()}
             
             ${showMain ? html`
@@ -315,12 +328,12 @@ export class JkBmsDefaultLayout extends LitElement {
                     <div class="clickable center" @click=${(e) => this._navigate(e, EntityKey.total_voltage)}>
                     <b><font color="#41CD52" size="6">${this.getState(EntityKey.total_voltage)} ${localize('html_texts.volt')}</font></b>
                     </div>
-                    ${localize('stats.power')} <span class="clickable ${powerClass}" @click=${(e) => this._navigate(e, EntityKey.power)}>${this.getState(EntityKey.power, customDecimals)} W</span><br>
-                    ${localize('stats.capacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_battery_capacity_setting)}>${this.getState(EntityKey.total_battery_capacity_setting, customDecimals)} Ah</span><br>
-                    ${localize('stats.cycleCapacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_charging_cycle_capacity)}>${this.getState(EntityKey.total_charging_cycle_capacity, customDecimals)} Ah</span><br>
-                    ${localize('stats.averageCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.average_cell_voltage)}>${this.getState(EntityKey.average_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>
-                    ${EntityKey.min_cell_voltage && this.getState(EntityKey.min_cell_voltage) != '' ? html`${localize('stats.minCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.min_cell_voltage)}>${this.getState(EntityKey.min_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>` : ''}
-                    ${localize('stats.balanceCurrent')} <span class="${balanceClass}">${balanceCurrent.toFixed(1)} A</span>
+                    <div class="${rowClass}">${localize('stats.power')} <span class="clickable ${powerClass}" @click=${(e) => this._navigate(e, EntityKey.power)}>${this.getState(EntityKey.power, customDecimals)} W</span></div>
+                    <div class="${rowClass}">${localize('stats.capacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_battery_capacity_setting)}>${this.getState(EntityKey.total_battery_capacity_setting, customDecimals)} Ah</span></div>
+                    <div class="${rowClass}">${localize('stats.cycleCapacity')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.total_charging_cycle_capacity)}>${this.getState(EntityKey.total_charging_cycle_capacity, customDecimals)} Ah</span></div>
+                    <div class="${rowClass}">${localize('stats.averageCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.average_cell_voltage)}>${this.getState(EntityKey.average_cell_voltage, 3)} ${localize('html_texts.volt')}</span></div>
+                    ${EntityKey.min_cell_voltage && this.getState(EntityKey.min_cell_voltage) != '' ? html`<div class="${rowClass}">${localize('stats.minCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.min_cell_voltage)}>${this.getState(EntityKey.min_cell_voltage, 3)} ${localize('html_texts.volt')}</span></div>` : ''}
+                    <div class="${rowClass}">${localize('stats.balanceCurrent')} <span class="${balanceClass}">${balanceCurrent.toFixed(1)} A</span></div>
                     ${this._renderTemps(1)}
                 </div>
 
@@ -328,12 +341,12 @@ export class JkBmsDefaultLayout extends LitElement {
                     <div class="clickable center" @click=${(e) => this._navigate(e, EntityKey.current)}>
                     <b><font color="#41CD52" size="6">${this.getState(EntityKey.current)} A</font></b>
                     </div>
-                    ${localize('stats.stateOfCharge')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>${this.getState(EntityKey.state_of_charge, socDecimals)} %</span><br>
-                    ${localize('stats.remainingAmps')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>${this.getState(EntityKey.capacity_remaining, customDecimals)} Ah</span><br>
-                    ${localize('stats.cycles')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.charging_cycles)}>${this.getState(EntityKey.charging_cycles, customDecimals)}</span><br>
-                    ${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatValue(this.getUnit(EntityKey.delta_cell_voltage) ?? 'V', this.config.deltaVoltageUnit ?? 'V', this.deltaV)} </span><br>
-                    ${EntityKey.max_cell_voltage && this.getState(EntityKey.max_cell_voltage) != '' ? html`${localize('stats.maxCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.max_cell_voltage)}>${this.getState(EntityKey.max_cell_voltage, 3)} ${localize('html_texts.volt')}</span><br>` : ''}
-                    ${localize('stats.mosfetTemp')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${this.getState(EntityKey.power_tube_temperature)} ${this.getUnit(EntityKey.power_tube_temperature)}</span>
+                    <div class="${rowClass}">${localize('stats.stateOfCharge')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.state_of_charge)}>${this.getState(EntityKey.state_of_charge, socDecimals)} %</span></div>
+                    <div class="${rowClass}">${localize('stats.remainingAmps')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.capacity_remaining)}>${this.getState(EntityKey.capacity_remaining, customDecimals)} Ah</span></div>
+                    <div class="${rowClass}">${localize('stats.cycles')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.charging_cycles)}>${this.getState(EntityKey.charging_cycles, customDecimals)}</span></div>
+                    <div class="${rowClass}">${localize('stats.delta')} <span class="${deltaClass}" @click=${(e) => this._navigate(e, EntityKey.delta_cell_voltage)}> ${formatValue(this.getUnit(EntityKey.delta_cell_voltage) ?? 'V', this.config.deltaVoltageUnit ?? 'V', this.deltaV)} </span></div>
+                    ${EntityKey.max_cell_voltage && this.getState(EntityKey.max_cell_voltage) != '' ? html`<div class="${rowClass}">${localize('stats.maxCellV')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.max_cell_voltage)}>${this.getState(EntityKey.max_cell_voltage, 3)} ${localize('html_texts.volt')}</span></div>` : ''}
+                    <div class="${rowClass}">${localize('stats.mosfetTemp')} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey.power_tube_temperature)}>${this.getState(EntityKey.power_tube_temperature)} ${this.getUnit(EntityKey.power_tube_temperature)}</span></div>
                     ${this._renderTemps(2)}
                 </div>
             </div>
@@ -385,9 +398,10 @@ export class JkBmsDefaultLayout extends LitElement {
     private _renderTemps(placement): TemplateResult {
         const sensors: TemplateResult[] = [];
         const sensorsCount = this.config?.tempSensorsCount ?? 0;
+        const rowClass = this.config.showCondensed ? 'data-row' : 'data-row split'
         for (let i = placement; i <= sensorsCount; i += 2) {
             sensors.push(html`
-                <br>${localize('stats.temperature_sensor_' + i)} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey['temperature_sensor_' + i])}>${this.getState(EntityKey['temperature_sensor_' + i])} ${this.getUnit(EntityKey['temperature_sensor_' + i])}</span>`);
+                <div class="${rowClass}">${localize('stats.temperature_sensor_' + i)} <span class="clickable" @click=${(e) => this._navigate(e, EntityKey['temperature_sensor_' + i])}>${this.getState(EntityKey['temperature_sensor_' + i])} ${this.getUnit(EntityKey['temperature_sensor_' + i])}</span></div>`);
         }
 
         return html`${sensors}`;
