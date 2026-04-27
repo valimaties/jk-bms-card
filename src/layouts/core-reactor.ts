@@ -84,7 +84,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         }
 
         .icon-circle ha-icon {
-            --mdc-icon-size: 30px;
+            --mdc-icon-size: clamp(20px, round(4cqi + 4px, 2px), 30px);
         }
 
         .node-label {
@@ -160,6 +160,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         }
 
         .stats-panel {
+            container-type: inline-size;
             background: var(--panel-bg);
             border: var(--panel-border);
             border-radius: 10px;
@@ -216,8 +217,8 @@ export class JkBmsCoreReactorLayout extends LitElement {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 30px;
-            height: 30px;
+            width: clamp(20px, round(4cqi + 4px, 2px), 30px);
+            height: clamp(20px, round(4cqi + 4px, 2px), 30px);
             justify-self: start;
         }
 
@@ -227,7 +228,8 @@ export class JkBmsCoreReactorLayout extends LitElement {
         }
 
         .icon-stats > .stat-value {
-            font-size: 1.2em;
+            white-space: nowrap;
+            font-size: clamp(0.8em, round(8cqi + 0.25rem, 0.1em), 1.2em);
             font-weight: bold;
         }
 
@@ -271,6 +273,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         }
 
         .cell-item {
+            container-type: inline-size;
             background: var(--secondary-background-color, #2a2a2a);
             border-radius: 8px;
             padding: 4px 6px;
@@ -278,13 +281,14 @@ export class JkBmsCoreReactorLayout extends LitElement {
             align-items: center;
             justify-content: space-between;
             gap: 4px;
-            font-size: 0.85em;
+            font-size: 1em;
             position: relative;
             overflow: hidden;
             z-index: 0;
         }
 
         .cell-item-vertical {
+            container-type: inline-size;
             flex-direction: column;
             justify-content: center;
             padding: 6px 4px;
@@ -323,13 +327,15 @@ export class JkBmsCoreReactorLayout extends LitElement {
         .cell-volts {
             color: var(--primary-text-color);
             font-family: monospace;
-            font-size: 1.2em;
+            font-size: clamp(0.7em, round(6cqi + 0.2em, 0.2em), 1.2em) !important;
+            white-space: nowrap;
         }
 
         .cell-res {
             color: var(--secondary-text-color);
-            font-size: 1em;
             font-family: monospace;
+            font-size: clamp(0.7em, round(6cqi + 0.2em, 0.2em), 1em) !important;
+            white-space: nowrap;
         }
 
         .cell-low {
