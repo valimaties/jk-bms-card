@@ -25,6 +25,7 @@ export class JkBmsDefaultLayout extends LitElement {
             gap: 4px;
             margin: 4px;
             align-content: center;
+            min-width: 300px;
         }
 
         .grid-1 {
@@ -59,8 +60,13 @@ export class JkBmsDefaultLayout extends LitElement {
             grid-template-columns: repeat(8, 1fr);
         }
 
+        .cell-container {
+            container-type: inline-size;
+            min-width: 32px;
+        }
+
         .label {
-            font-size: clamp(0.7em, round(8cqi + 0.25rem, 0.2em), 1em);
+            font-size: clamp(0.68rem, round(10cqi + 0.2rem, 0.1rem), 1rem) !important;
             white-space: nowrap;
         }
 
@@ -168,14 +174,14 @@ export class JkBmsDefaultLayout extends LitElement {
 
         .pill {
             display: inline-block;
-            padding: 0.15rem 0.25rem;
+            padding: 0.2rem 0.2rem;
             background-color: #195569;
             color: #e4f3f8;
-            border-radius: 999px;
+            border-radius: 50%;
             font-weight: 500;
             font-family: sans-serif;
-            font-size: 0.9rem;
-            min-width: 2rem;
+            font-size: clamp(0.8rem, round(10cqi + 0.2rem, 0.2rem), 0.9rem);
+            min-width: 1.5em;
             text-align: center;
         }
 
@@ -490,10 +496,10 @@ export class JkBmsDefaultLayout extends LitElement {
 
         return html`
             <div class="center cell-container" id="cell-${i}">
-            <span class="label clickable" @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`],)}>
-                <span class="pill">${i.toString().padStart(2, '0')}</span>${(!resNotExists && columns > 3) ? html`<br>` : html``}
-            ${color ? html`<span class="label ${color}">${voltage} ${localize('html_texts.volt')}</span>` : html`${voltage} ${localize('html_texts.volt')}`}
-          </span>
+                <span class="label clickable" @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`],)}>
+                    <span class="pill">${i.toString().padStart(2, '0')}</span>${(!resNotExists && columns > 3) ? html`<br>` : html``}
+                ${color ? html`<span class="label ${color}">${voltage} ${localize('html_texts.volt')}</span>` : html`${voltage} ${localize('html_texts.volt')}`}
+                </span>
                 ${resistanceHtml}
             </div>
         `;
