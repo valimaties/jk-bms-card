@@ -60,9 +60,33 @@ export class JkBmsDefaultLayout extends LitElement {
             grid-template-columns: repeat(8, 1fr);
         }
 
+        .center {
+            text-align: center !important;
+            align-content: center !important;
+        }
+
         .cell-container {
+            display: flex;
+            flex-direction: row;
             container-type: inline-size;
-            min-width: 32px;
+            align-items: center;
+            padding: 5px;
+            justify-content:center;
+        }
+
+        .multi-line {
+            display: flex !important;
+            flex-direction: column !important; 
+            align-items: center; 
+            justify-content: center;
+            gap: 2px; 
+        }
+
+        .single-line {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center;
+            gap: 5px;
         }
 
         .label {
@@ -165,11 +189,6 @@ export class JkBmsDefaultLayout extends LitElement {
 
         .voltage-low {
             color: red;
-        }
-
-        .center {
-            text-align: center;
-            align-content: center;
         }
 
         .pill {
@@ -487,20 +506,20 @@ export class JkBmsDefaultLayout extends LitElement {
         const color = i.toString() === minCell ? 'voltage-low'
             : i.toString() === maxCell ? 'voltage-high'
                 : '';
-        const resNotExists = resistance == '';
+        const resNotExists = resistance === '-';
 
         let resistanceHtml = resNotExists ? '' : html`
             <span class="label clickable" @click=${(e) => this._navigate(e, EntityKey[`cell_resistance_${i}`])}>
-            ${columns <= 3 ? html` / ` : html`<br>`}${resistance}
+            ${columns <= 3 ? html` / ` : ''}${resistance}
           </span>`
 
         return html`
             <div class="center cell-container" id="cell-${i}">
-                <span class="label clickable" @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`],)}>
-                    <span class="pill">${i.toString().padStart(2, '0')}</span>${(!resNotExists && columns > 3) ? html`<br>` : html``}
-                ${color ? html`<span class="label ${color}">${voltage} ${localize('html_texts.volt')}</span>` : html`${voltage} ${localize('html_texts.volt')}`}
-                </span>
-                ${resistanceHtml}
+                <div class="clickable ${columns > 3 ? "multi-line" : "single-line"}" @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`],)}>
+                    <span class="pill">${i.toString().padStart(2, '0')}</span>
+                    <span class="label ${color}">${voltage} ${localize('html_texts.volt')}</span>
+                    ${resistanceHtml}
+                </div>
             </div>
         `;
     }
