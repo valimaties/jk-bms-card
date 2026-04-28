@@ -52,6 +52,7 @@ export class JkBmsCard extends LitElement {
             showCondensed: true,
             showMainStats: true,
             showCells: true,
+            showResistances: true,
             showCardVersion: false,
             entities: Object.keys(EntityKey).reduce((acc, key) => {
                 acc[key as EntityKey] = '';

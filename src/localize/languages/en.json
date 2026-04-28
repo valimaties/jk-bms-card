@@ -31,6 +31,7 @@
     "showCondensed": "Condensed",
     "showMainStats": "Stats",
     "showCells": "Cells",
+    "showResistances": "Cell R.",
     "showCardVersion": "Version"
   },
   "switches": {

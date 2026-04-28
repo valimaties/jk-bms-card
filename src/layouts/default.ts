@@ -72,6 +72,7 @@ export class JkBmsDefaultLayout extends LitElement {
             align-items: center;
             padding: 5px;
             justify-content:center;
+            container-type: inline-size;
         }
 
         .multi-line {
@@ -89,9 +90,24 @@ export class JkBmsDefaultLayout extends LitElement {
             gap: 5px;
         }
 
+        .multi-line, .single-line {
+            width: 100%; 
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+
         .label {
-            font-size: clamp(0.68rem, round(10cqi + 0.2rem, 0.1rem), 1rem) !important;
+            font-size: clamp(0.68rem, round(20cqi + 0.2rem, 0.1rem), 1rem) !important;
             white-space: nowrap;
+        }
+        
+        .label.stats {
+            width: 100%;
+        }
+        
+        .label.res {
+            font-size: clamp(0.64rem, round(14cqi + 0.2rem, 0.1rem), 0.8rem) !important;
         }
 
         .clickable {
@@ -115,7 +131,6 @@ export class JkBmsDefaultLayout extends LitElement {
         }
 
         .data-row.split {
-            content-type: inline-size;
             justify-content: space-between;
             margin-right: 4px;
             white-space: nowrap;
@@ -310,9 +325,10 @@ export class JkBmsDefaultLayout extends LitElement {
         const showMain = this.config.showMain;
         const showCondensed = this.config.showCondensed;
         const showCells = this.config.showCells;
+        const showRes = this.config.showResistances;
         const showCardVersion = this.config.showCardVersion;
 
-        const rowClass = showCondensed ? 'data-row' : 'data-row split';
+        const rowClass = showCondensed ? 'stats data-row' : 'stats data-row split';
 
         this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
         this.maxCellId = this.getState(EntityKey.max_voltage_cell, 0);
@@ -392,7 +408,7 @@ export class JkBmsDefaultLayout extends LitElement {
             
             ${showCells ? html`
             <div class="grid grid-${this.config.cellColumns ?? 2}">
-                ${this._renderCells(this.config.cellLayout == "bankMode")}
+                ${this._renderCells(this.config.cellLayout == "bankMode", showRes)}
             </div>    
             `:html``}
             ${showCardVersion ? html`
@@ -440,7 +456,7 @@ export class JkBmsDefaultLayout extends LitElement {
         return html`${sensors}`;
     }
 
-    private _renderCells(bankmode = true): TemplateResult {
+    private _renderCells(bankmode = true, showRes: boolean): TemplateResult {
         const cells: TemplateResult[] = [];
 
         const start = 1;
@@ -452,14 +468,14 @@ export class JkBmsDefaultLayout extends LitElement {
 
         for (let i = start; i <= end; i++) {
             if (bankmode && uneven && i == end) {
-                cells.push(this._createCell(totalCells, columns));
+                cells.push(this._createCell(totalCells, columns, showRes));
             } else {
-                cells.push(this._createCell(i, columns));
+                cells.push(this._createCell(i, columns, showRes));
             }
 
             if (bankmode && (i < end || !uneven)) {
                 for (let ii = 1; ii < columns; ii++) {
-                    cells.push(this._createCell(i + (bankOffset * ii), columns));
+                    cells.push(this._createCell(i + (bankOffset * ii), columns, showRes));
                 }
             }
         }
@@ -495,7 +511,7 @@ export class JkBmsDefaultLayout extends LitElement {
         this.deltaV = Number((maxVoltage - minVoltage).toFixed(3));
     }
 
-    private _createCell(i, columns: number) {
+    private _createCell(i, columns: number, showRes: boolean) {
         const voltage = this.getState(EntityKey[`cell_voltage_${i}`], 3, '0.0');
         const res = this.getUnit(EntityKey[`cell_resistance_${i}`]) ?? 'Ω'; // get original unit of resistance sensor, fallback to Ω
         const resUnit = this.config?.resistanceUnit ?? res; // get resistance from config, fallback to original unit
@@ -506,18 +522,19 @@ export class JkBmsDefaultLayout extends LitElement {
         const color = i.toString() === minCell ? 'voltage-low'
             : i.toString() === maxCell ? 'voltage-high'
                 : '';
-        const resNotExists = resistance === '-';
+        const resExists = showRes && resistance !== '-';
+        const cellUnit = localize('html_texts.volt');
 
-        let resistanceHtml = resNotExists ? '' : html`
+        let resistanceHtml = resExists ? html`
             <span class="label clickable" @click=${(e) => this._navigate(e, EntityKey[`cell_resistance_${i}`])}>
             ${columns <= 3 ? html` / ` : ''}${resistance}
-          </span>`
+          </span>` : '';
 
         return html`
             <div class="center cell-container" id="cell-${i}">
                 <div class="clickable ${columns > 3 ? "multi-line" : "single-line"}" @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`],)}>
                     <span class="pill">${i.toString().padStart(2, '0')}</span>
-                    <span class="label ${color}">${voltage} ${localize('html_texts.volt')}</span>
+                    <span class="label ${color}">${voltage}${resExists ? cellUnit : ''}</span>
                     ${resistanceHtml}
                 </div>
             </div>

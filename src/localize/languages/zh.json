@@ -31,6 +31,7 @@
     "showCondensed": "紧凑",
     "showMainStats": "统计",
     "showCells": "电池",
+    "showResistances": "电池 R.",
     "showCardVersion": "版本"
   },
   "switches": {

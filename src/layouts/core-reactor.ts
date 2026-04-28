@@ -700,6 +700,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         const showButtons = this.config.showButtons;
         const showMain = this.config.showMain;
         const showCells = this.config.showCells;
+        const showRes = this.config.showResistances;
         const showCardVersion = this.config.showCardVersion;
 
         this.minCellId = this.getState(EntityKey.min_voltage_cell, 0);
@@ -892,7 +893,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                 <!-- Cells -->
                 ${showCells ? html`
                 <div class="cell-grid grid-${this.config.cellColumns ?? 2}">
-                    ${this._renderCells()}
+                    ${this._renderCells(showRes)}
                 </div>` : html``}
                 ${showCardVersion ? html`
                 <div class="cardVersion">
@@ -1030,7 +1031,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         `;
     }
 
-    private _renderCells(): TemplateResult[] {
+    private _renderCells(showRes: boolean): TemplateResult[] {
         const cells: TemplateResult[] = [];
         const bankMode = this.config.cellLayout === 'bankMode';
         const columns = this.config.cellColumns || 2;
@@ -1060,14 +1061,14 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
             // Render each cell
             for (const cellNum of cellsToRender) {
-                this._renderSingleCell(cells, cellNum);
+                this._renderSingleCell(cells, cellNum, showRes);
             }
         }
 
         return cells;
     }
 
-    private _renderSingleCell(cells: TemplateResult[], i: number): void {
+    private _renderSingleCell(cells: TemplateResult[], i: number, showRes: boolean): void {
         const v = this.getState(EntityKey[`cell_voltage_${i}`] as EntityKey, 3, '0.000');
         const rU = this.getUnit(EntityKey[`cell_resistance_${i}`] as EntityKey) ?? 'Ω';
         const resUnit = this.config?.resistanceUnit ?? rU;
@@ -1093,7 +1094,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
         }
 
         const rParam = parseFloat(r);
-        const showResistance = !isNaN(rParam) && rParam > 0;
+        const showResistance = !isNaN(rParam) && rParam > 0 && showRes;
         const rWithUnit = formatValue(rU, resUnit, rParam);
 
         const colorMode = this.config.cellColorMode || 'progress';
