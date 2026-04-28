@@ -103,6 +103,7 @@ export class JkBmsDefaultLayout extends LitElement {
         }
         
         .label.stats {
+            font-size: clamp(0.48rem, round(14cqi + 0.2rem, 0.1rem), 1rem) !important;
             width: 100%;
         }
         

@@ -396,7 +396,7 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
                             : ''}
 
                         ${this.renderBoolean(localize('config.showCells'), 'showCells')}
-                        ${this._config?.prefix !== '' && this._config?.showCells ?
+                        ${this._config?.showCells === true ?
                             this.renderBoolean(localize('config.showResistances'), 'showResistances') 
                             : ''}
                         ${this.renderBoolean(localize('config.showCardVersion'), 'showCardVersion')}
@@ -417,10 +417,11 @@ export class JkBmsCardEditor extends LitElement implements LovelaceCardEditor {
             this._updateDynamicEntitySchema();
         }
         const shouldShowMainStats =
-            config.showMain === true &&
-            config.layout === 'core-reactor';
+            config?.showMain === true &&
+            config?.layout === 'core-reactor';
 
-        const shouldShowCellsResistances = config.prefix !== '' && config.showCells;
+        const shouldShowCellsResistances = 
+            config?.showCells === true;
 
         if (!shouldShowMainStats && config.showMainStats !== undefined) {
             delete config.showMainStats;
