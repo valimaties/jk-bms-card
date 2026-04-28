@@ -177,11 +177,11 @@ export class JkBmsDefaultLayout extends LitElement {
             padding: 0.2rem 0.2rem;
             background-color: #195569;
             color: #e4f3f8;
-            border-radius: 50%;
+            border-radius: 999px;
             font-weight: 500;
             font-family: sans-serif;
             font-size: clamp(0.8rem, round(10cqi + 0.2rem, 0.2rem), 0.9rem);
-            min-width: 1.5em;
+            min-width: 1.8rem;
             text-align: center;
         }
 
