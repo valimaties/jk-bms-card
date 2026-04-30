@@ -36,7 +36,7 @@ export class JkBmsCard extends LitElement {
             language: 'auto',
             title: localize("title"),
             prefix: "jk_bms",
-            batteryNumber: 1,
+            batteryName: '',
             cellCount: 16,
             cellColumns: 2,
             cellLayout: "bankMode",
@@ -49,8 +49,10 @@ export class JkBmsCard extends LitElement {
             showTitle: true,
             showButtons: true,
             showMain: true,
+            showCondensed: true,
             showMainStats: true,
             showCells: true,
+            showResistances: true,
             showCardVersion: false,
             entities: Object.keys(EntityKey).reduce((acc, key) => {
                 acc[key as EntityKey] = '';

@@ -8,7 +8,7 @@
     "language": "Language",
     "title": "Title",
     "prefix": "Prefix of the sensors",
-    "batteryNumber": "Battery number",
+    "batteryName": "Battery name",
     "cellCount": "Number of cells",
     "cellColumns": "Number of columns",
     "cellLayout": "Cell Layout",
@@ -28,8 +28,10 @@
     "showTitle": "Title",
     "showButtons": "Buttons",
     "showMain": "Main",
+    "showCondensed": "Condensed",
     "showMainStats": "Stats",
     "showCells": "Cells",
+    "showResistances": "Cell R.",
     "showCardVersion": "Version"
   },
   "switches": {
@@ -57,7 +59,6 @@
     "temperature_sensor_4": "Temp. 4:"
   },
   "html_texts": {
-    "batNumber": "Bat.",
     "capacity": "Capacity",
     "time": "Time",
     "grid-solar": "Grid/Solar",
