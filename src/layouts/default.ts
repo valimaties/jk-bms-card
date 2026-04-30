@@ -70,7 +70,6 @@ export class JkBmsDefaultLayout extends LitElement {
             flex-direction: row;
             container-type: inline-size;
             align-items: center;
-            padding: 5px;
             justify-content:center;
             container-type: inline-size;
         }
@@ -80,6 +79,7 @@ export class JkBmsDefaultLayout extends LitElement {
             flex-direction: column !important; 
             align-items: center; 
             justify-content: center;
+            padding: 5px 0px;
             gap: 2px; 
         }
 
