@@ -276,28 +276,28 @@ export class JkBmsCoreReactorLayout extends LitElement {
             container-type: inline-size;
             background: var(--secondary-background-color, #2a2a2a);
             border-radius: 8px;
-            padding: 4px 6px;
+            padding: 3px 2px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 4px;
-            font-size: 1em;
             position: relative;
-            overflow: hidden;
             z-index: 0;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .cell-item-vertical {
             container-type: inline-size;
             flex-direction: column;
             justify-content: center;
-            padding: 6px 4px;
+            padding: 2px 3px;
             gap: 3px;
+            white-space: nowrap;
         }
 
         .cell-item-vertical .cell-id {
-            margin-right: 0;
-            margin-bottom: 2px;
+            padding-top: 2px;
         }
 
         .cell-item-bg {
@@ -312,13 +312,13 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
         .cell-id {
             display: inline-block;
-            padding: 0.1rem 0.25rem;
+            padding: 0.2rem 0.5rem;
             background-color: #195569;
             color: #e4f3f8;
             border-radius: 999px;
-            font-weight: 500;
-            font-size: 1em;
-            min-width: 1.4rem;
+            font-weight: 600;
+            font-size: clamp(0.8rem, round(14cqi, 0.05rem), 1rem) !important;
+            min-width: 1.2rem;
             text-align: center;
             margin-right: 3px;
             flex-shrink: 0;
@@ -327,14 +327,14 @@ export class JkBmsCoreReactorLayout extends LitElement {
         .cell-volts {
             color: var(--primary-text-color);
             font-family: monospace;
-            font-size: clamp(0.7em, round(6cqi + 0.2em, 0.2em), 1.2em) !important;
+            font-size: clamp(0.9rem, round(14cqi, 0.05rem), 1.2rem) !important;
             white-space: nowrap;
         }
 
         .cell-res {
             color: var(--secondary-text-color);
             font-family: monospace;
-            font-size: clamp(0.7em, round(6cqi + 0.2em, 0.2em), 1em) !important;
+            font-size: clamp(0.6rem, round(12cqi, 0.05rem), 0.8rem) !important;
             white-space: nowrap;
         }
 
@@ -596,8 +596,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
     _renderSparkline(entityKey: EntityKey, color: string): TemplateResult {
         const entityId = this._resolveEntityId(entityKey);
         if (!entityId || !this.historyData[entityId] || this.historyData[entityId].length < 2) {
-            return html`
-                <div style="height: 30px;"></div>`;
+            return html``;
         }
 
         const data = this.historyData[entityId];
@@ -1095,7 +1094,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
 
         const rParam = parseFloat(r);
         const showResistance = !isNaN(rParam) && rParam > 0 && showRes;
-        const rWithUnit = formatValue(rU, resUnit, rParam);
+        const rWithUnit = formatValue(rU, resUnit, rParam).replace(' ','');
 
         const colorMode = this.config.cellColorMode || 'progress';
         let cellStyle = '';
@@ -1125,8 +1124,12 @@ export class JkBmsCoreReactorLayout extends LitElement {
         }
 
         const textBgStyle = colorMode === 'gradient' ? 'background: rgba(0, 0, 0, 0.25); padding: 1px 3px; border-radius: 3px;' : '';
-        const orientation = this.config.cellOrientation || 'horizontal';
+        const orientation = this.config.cellColumns > 4 || 
+                            (this.config.showResistances === true && this.config.cellColumns > 3) 
+                            ? 'vertical' 
+                            : this.config.cellOrientation || 'horizontal';
         const cellClass = orientation === 'vertical' ? 'cell-item cell-item-vertical' : 'cell-item';
+        const voltUnit = localize('html_texts.volt');
 
         cells.push(html`
             <div class="${cellClass}" style="${cellStyle}">
@@ -1135,7 +1138,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                 ${orientation === 'vertical' ? html`
                     <span class="cell-id">${String(i).padStart(2, '0')}</span>
                     <span class="cell-volts ${valClass} clickable" style="${textBgStyle}"
-                          @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`] as EntityKey)}>${v} ${localize('html_texts.volt')}</span>
+                          @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`] as EntityKey)}>${v}${showResistance ? voltUnit : ''}</span>
                     ${showResistance ? html`
                         <span class="cell-res clickable" style="${textBgStyle}"
                               @click=${(e) => this._navigate(e, EntityKey[`cell_resistance_${i}`] as EntityKey)}>${rWithUnit}</span>
@@ -1144,7 +1147,7 @@ export class JkBmsCoreReactorLayout extends LitElement {
                     <span class="clickable"
                           @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`] as EntityKey)}>
                             <span class="cell-id">${String(i).padStart(2, '0')}</span>
-                            <span class="cell-volts ${valClass}" style="${textBgStyle}">${v} ${localize('html_texts.volt')}</span>
+                            <span class="cell-volts ${valClass}" style="${textBgStyle}">${v}${showResistance ? voltUnit : ''}</span>
                         </span>
                     ${showResistance ? html`
                         <span class="cell-res clickable" style="${textBgStyle}"

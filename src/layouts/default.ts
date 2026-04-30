@@ -516,7 +516,7 @@ export class JkBmsDefaultLayout extends LitElement {
         const voltage = this.getState(EntityKey[`cell_voltage_${i}`], 3, '0.0');
         const res = this.getUnit(EntityKey[`cell_resistance_${i}`]) ?? 'Ω'; // get original unit of resistance sensor, fallback to Ω
         const resUnit = this.config?.resistanceUnit ?? res; // get resistance from config, fallback to original unit
-        const resistance = formatValue(res, resUnit, this.getState(EntityKey[`cell_resistance_${i}`], 3));
+        const resistance = formatValue(res, resUnit, this.getState(EntityKey[`cell_resistance_${i}`], 3)).replace(' ', '');
         const minCell = this.minCellId;
         const maxCell = this.maxCellId;
 
@@ -533,7 +533,7 @@ export class JkBmsDefaultLayout extends LitElement {
 
         return html`
             <div class="center cell-container" id="cell-${i}">
-                <div class="clickable ${columns > 3 ? "multi-line" : "single-line"}" @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`],)}>
+                <div class="clickable ${columns > 4 || (columns > 3 && resExists === true) ? "multi-line" : "single-line"}" @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`],)}>
                     <span class="pill">${i.toString().padStart(2, '0')}</span>
                     <span class="label ${color}">${voltage}${resExists ? cellUnit : ''}</span>
                     ${resistanceHtml}
