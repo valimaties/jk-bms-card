@@ -563,7 +563,6 @@ export class JkBmsDefaultLayout extends LitElement {
             path.style.display = 'none';
             return;
         }
-
         path.style.display = 'inline';
 
         const hostEl = this.renderRoot instanceof ShadowRoot ? (this.renderRoot.host as HTMLElement) : this;
@@ -574,72 +573,73 @@ export class JkBmsDefaultLayout extends LitElement {
         const columns = this.config?.cellColumns ?? 2;
         const colWidth = cardRect.width / columns;
 
-        // 1. Calculăm indexul coloanelor (0, 1, 2...)
+        // Columns calculation
         const colFrom = Math.floor((maxRect.left + maxRect.width / 2 - cardRect.left) / colWidth);
-        const colTo = Math.floor((minRect.left + minRect.width / 2 - cardRect.left) / colWidth);
-
-        // 2. LOGICA DE DETERMINARE A PĂRȚILOR (ANCHOR SIDES)
-        let sideFrom: 'left' | 'right';
-        let sideTo: 'left' | 'right';
-
-        // Setăm default: pleacă spre direcția țintei
-        sideFrom = colFrom < colTo ? 'right' : 'left';
-        sideTo = colFrom < colTo ? 'left' : 'right';
-
-        const isAdjacent = Math.abs(colFrom - colTo) === 1;
+        const colTo   = Math.floor((minRect.left + minRect.width / 2 - cardRect.left) / colWidth);
         const isSameRow = Math.abs(maxRect.top - minRect.top) < 10;
-        // --- APLICARE REGULI SPECIFICE ---
 
-        if (isSameRow) {
-            // Conexiune orizontală directă
-            sideFrom = maxRect.left < minRect.left ? 'right' : 'left';
-            sideTo = maxRect.left < minRect.left ? 'left' : 'right';
-        } else if (colFrom === colTo) {
-            // Aceeași coloană: Ieșim prin partea mai liberă (spre centrul cardului)
-            const side = (colFrom < columns / 2) ? 'right' : 'left';
-            sideFrom = sideTo = side;
-        } 
-        else if (isAdjacent) {
-            // Cazul 1 -> 2 (0 -> 1): Pleacă dreapta, ajunge dreapta
-            if (colFrom === 0 && colTo === 1 && columns > 2) {
-                sideFrom = 'right'; sideTo = 'right';
-            }
-            // Cazul 3 -> 2 (2 -> 1): Pleacă stânga, ajunge stânga
-            else if (colFrom === 2 && colTo === 1) {
-                sideFrom = 'left'; sideTo = 'left';
-            }
-            // Cazul 3 -> 4 (2 -> 3): Ocol prin stânga (cum ai cerut)
-            else if (colFrom === 2 && colTo === 3 && columns === 4) {
-                sideFrom = 'left'; sideTo = 'left';
-            }
-            // Cazul 2 -> 3 (1 -> 2): Rămâne normal (Right -> Left)
-        }
-        // Cazul 1 -> 3 (0 -> 2): Rămâne normal (Right -> Left)
-
-        // 3. CALCUL COORDONATE FINALE
+        // FuHelper function for coordinates
         const getCoords = (rect: DOMRect, side: 'left' | 'right') => ({
             x: side === 'right' ? rect.right - cardRect.left : rect.left - cardRect.left,
             y: rect.top + rect.height / 2 - cardRect.top
         });
 
-        const from = getCoords(maxRect, sideFrom);
-        const to = getCoords(minRect, sideTo);
+        let sideFrom: 'left' | 'right';
+        let sideTo: 'left' | 'right';
 
-        // 4. DESENARE PATH
+        // Case 1:  same row -> directly horizontal bond
+        if (isSameRow) {
+            sideFrom = maxRect.left < minRect.left ? 'right' : 'left';
+            sideTo   = maxRect.left < minRect.left ? 'left'  : 'right';
+        }
+        // Case 2: same column -> U-shape on the card's center side-most
+        else if (colFrom === colTo) {
+            const side = (colFrom < columns / 2) ? 'right' : 'left';
+            sideFrom = sideTo = side;
+        }
+        // Case 3: Different columns
+        else {
+            const direction = colFrom < colTo ? 'rightToLeft' : 'leftToRight';
+            // For adjacents, we can use the same side if we are on the margins
+            const isAdjacent = Math.abs(colFrom - colTo) === 1;
+            if (isAdjacent) {
+                // If we are on the first column, we get out on the right (to interior)
+                if (colFrom === 0) {
+                    sideFrom = 'right';
+                    sideTo   = (colTo === 1) ? 'right' : 'left';
+                }
+                // If we are on the latest column, we get out on the left
+                else if (colFrom === columns - 1) {
+                    sideFrom = 'left';
+                    sideTo   = (colTo === columns - 2) ? 'left' : 'right';
+                }
+                else {
+                    // Normal comportament for internal adjacents
+                    sideFrom = direction === 'rightToLeft' ? 'right' : 'left';
+                    sideTo   = direction === 'rightToLeft' ? 'left'  : 'right';
+                }
+            } else {
+                // Separated columns -> Classic Z
+                sideFrom = direction === 'rightToLeft' ? 'right' : 'left';
+                sideTo   = direction === 'rightToLeft' ? 'left'  : 'right';
+            }
+        }
+
+        const from = getCoords(maxRect, sideFrom);
+        const to   = getCoords(minRect, sideTo);
+
         const offset = 14;
         let d: string;
 
         if (sideFrom === sideTo) {
-            // LOGICA PENTRU "U-SHAPE" (Ocolire prin aceeași parte)
+            // U-shape
             const isRight = sideFrom === 'right';
-            // Cotul trebuie să fie la exteriorul celei mai "ieșite" celule
-            const elbowX = isRight 
-                ? Math.max(from.x, to.x) + offset 
+            const elbowX = isRight
+                ? Math.max(from.x, to.x) + offset
                 : Math.min(from.x, to.x) - offset;
-
             d = `M ${from.x},${from.y} L ${elbowX},${from.y} L ${elbowX},${to.y} L ${to.x},${to.y}`;
         } else {
-            // LOGICA PENTRU "Z-SHAPE" (Trecere dintr-o parte în alta)
+            // Z-shape
             const midX = (from.x + to.x) / 2;
             d = `M ${from.x},${from.y} L ${midX},${from.y} L ${midX},${to.y} L ${to.x},${to.y}`;
         }
