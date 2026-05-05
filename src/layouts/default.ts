@@ -74,6 +74,12 @@ export class JkBmsDefaultLayout extends LitElement {
             container-type: inline-size;
         }
 
+        div[class^="cell-div-"] {
+            width: auto;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
         .multi-line {
             display: flex !important;
             flex-direction: column !important; 
@@ -533,10 +539,12 @@ export class JkBmsDefaultLayout extends LitElement {
 
         return html`
             <div class="center cell-container" id="cell-${i}">
-                <div class="clickable ${columns > 4 || (columns > 3 && resExists === true) ? "multi-line" : "single-line"}" @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`],)}>
-                    <span class="pill">${i.toString().padStart(2, '0')}</span>
-                    <span class="label ${color}">${voltage}${resExists ? cellUnit : ''}</span>
-                    ${resistanceHtml}
+                <div class="cell-div-${i}">
+                    <div class="clickable ${columns > 4 || (columns > 3 && resExists === true) ? "multi-line" : "single-line"}" @click=${(e) => this._navigate(e, EntityKey[`cell_voltage_${i}`],)}>
+                        <span class="pill">${i.toString().padStart(2, '0')}</span>
+                        <span class="label ${color}">${voltage}${resExists ? cellUnit : ''}</span>
+                        ${resistanceHtml}
+                    </div>
                 </div>
             </div>
         `;
@@ -544,14 +552,13 @@ export class JkBmsDefaultLayout extends LitElement {
 
     private _updateFlowLine() {
         const balanceCurrent = parseFloat(this.getState(EntityKey.balancing_current, 3, '0'));
-
-        const minEl = this.renderRoot.querySelector(`#cell-${this.minCellId}`);
-        const maxEl = this.renderRoot.querySelector(`#cell-${this.maxCellId}`);
+        const minEl = this.renderRoot.querySelector(`.cell-div-${this.minCellId}`);
+        const maxEl = this.renderRoot.querySelector(`.cell-div-${this.maxCellId}`);
         const path = this.renderRoot.querySelector('#flow-path') as SVGPathElement;
 
-        if (!path) return;
+        if (!path || !minEl || !maxEl) return;
 
-        if ((!this.shouldBalance && balanceCurrent === 0) || !minEl || !maxEl) {
+        if (!this.shouldBalance && balanceCurrent === 0) {
             path.setAttribute('d', '');
             path.style.display = 'none';
             return;
@@ -559,46 +566,82 @@ export class JkBmsDefaultLayout extends LitElement {
 
         path.style.display = 'inline';
 
-        const hostEl = this.renderRoot instanceof ShadowRoot
-            ? this.renderRoot.host as HTMLElement
-            : this;
-
+        const hostEl = this.renderRoot instanceof ShadowRoot ? (this.renderRoot.host as HTMLElement) : this;
         const cardRect = hostEl.getBoundingClientRect();
         const minRect = minEl.getBoundingClientRect();
         const maxRect = maxEl.getBoundingClientRect();
 
-        const getSideAnchor = (rect: DOMRect): { side: 'left' | 'right', x: number, y: number } => {
-            const columns = this.config?.cellColumns ?? 2;
-            const centerX = rect.left + rect.width / 2;
-            const midCardX = cardRect.left + cardRect.width / 2;
-            const side = columns === 1 ? 'left' : (centerX < midCardX ? 'right' : 'left');
-            const x = columns === 1 ? cardRect.width / 2 - 80 : (side === 'right' ? rect.right - cardRect.left : rect.left - cardRect.left);
-            const y = rect.top + rect.height / 2 - cardRect.top;
-            return { side, x, y };
-        };
+        const columns = this.config?.cellColumns ?? 2;
+        const colWidth = cardRect.width / columns;
 
-        const from = getSideAnchor(maxRect);
-        const to = getSideAnchor(minRect);
+        // 1. Calculăm indexul coloanelor (0, 1, 2...)
+        const colFrom = Math.floor((maxRect.left + maxRect.width / 2 - cardRect.left) / colWidth);
+        const colTo = Math.floor((minRect.left + minRect.width / 2 - cardRect.left) / colWidth);
 
-        const horizontalOffset = 10;
+        // 2. LOGICA DE DETERMINARE A PĂRȚILOR (ANCHOR SIDES)
+        let sideFrom: 'left' | 'right';
+        let sideTo: 'left' | 'right';
+
+        // Setăm default: pleacă spre direcția țintei
+        sideFrom = colFrom < colTo ? 'right' : 'left';
+        sideTo = colFrom < colTo ? 'left' : 'right';
+
+        const isAdjacent = Math.abs(colFrom - colTo) === 1;
+        const isSameRow = Math.abs(maxRect.top - minRect.top) < 10;
+        // --- APLICARE REGULI SPECIFICE ---
+
+        if (isSameRow) {
+            // Conexiune orizontală directă
+            sideFrom = maxRect.left < minRect.left ? 'right' : 'left';
+            sideTo = maxRect.left < minRect.left ? 'left' : 'right';
+        } else if (colFrom === colTo) {
+            // Aceeași coloană: Ieșim prin partea mai liberă (spre centrul cardului)
+            const side = (colFrom < columns / 2) ? 'right' : 'left';
+            sideFrom = sideTo = side;
+        } 
+        else if (isAdjacent) {
+            // Cazul 1 -> 2 (0 -> 1): Pleacă dreapta, ajunge dreapta
+            if (colFrom === 0 && colTo === 1 && columns > 2) {
+                sideFrom = 'right'; sideTo = 'right';
+            }
+            // Cazul 3 -> 2 (2 -> 1): Pleacă stânga, ajunge stânga
+            else if (colFrom === 2 && colTo === 1) {
+                sideFrom = 'left'; sideTo = 'left';
+            }
+            // Cazul 3 -> 4 (2 -> 3): Ocol prin stânga (cum ai cerut)
+            else if (colFrom === 2 && colTo === 3 && columns === 4) {
+                sideFrom = 'left'; sideTo = 'left';
+            }
+            // Cazul 2 -> 3 (1 -> 2): Rămâne normal (Right -> Left)
+        }
+        // Cazul 1 -> 3 (0 -> 2): Rămâne normal (Right -> Left)
+
+        // 3. CALCUL COORDONATE FINALE
+        const getCoords = (rect: DOMRect, side: 'left' | 'right') => ({
+            x: side === 'right' ? rect.right - cardRect.left : rect.left - cardRect.left,
+            y: rect.top + rect.height / 2 - cardRect.top
+        });
+
+        const from = getCoords(maxRect, sideFrom);
+        const to = getCoords(minRect, sideTo);
+
+        // 4. DESENARE PATH
+        const offset = 14;
         let d: string;
 
-        if (from.side === to.side) {
-            const elbowX = from.side === 'right'
-                ? from.x + horizontalOffset
-                : from.x - horizontalOffset;
+        if (sideFrom === sideTo) {
+            // LOGICA PENTRU "U-SHAPE" (Ocolire prin aceeași parte)
+            const isRight = sideFrom === 'right';
+            // Cotul trebuie să fie la exteriorul celei mai "ieșite" celule
+            const elbowX = isRight 
+                ? Math.max(from.x, to.x) + offset 
+                : Math.min(from.x, to.x) - offset;
 
-            d = `M ${from.x},${from.y}
-             L ${elbowX},${from.y}
-             L ${elbowX},${to.y}
-             L ${to.x},${to.y}`;
+            d = `M ${from.x},${from.y} L ${elbowX},${from.y} L ${elbowX},${to.y} L ${to.x},${to.y}`;
         } else {
+            // LOGICA PENTRU "Z-SHAPE" (Trecere dintr-o parte în alta)
             const midX = (from.x + to.x) / 2;
-
-            d = `M ${from.x},${from.y}
-             L ${midX},${from.y}
-             L ${midX},${to.y}
-             L ${to.x},${to.y}`;
+            d = `M ${from.x},${from.y} L ${midX},${from.y} L ${midX},${to.y} L ${to.x},${to.y}`;
         }
 
         path.setAttribute('d', d);
