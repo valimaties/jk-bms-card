@@ -578,7 +578,7 @@ export class JkBmsDefaultLayout extends LitElement {
         const colTo   = Math.floor((minRect.left + minRect.width / 2 - cardRect.left) / colWidth);
         const isSameRow = Math.abs(maxRect.top - minRect.top) < 10;
 
-        // FuHelper function for coordinates
+        // Helper function for coordinates
         const getCoords = (rect: DOMRect, side: 'left' | 'right') => ({
             x: side === 'right' ? rect.right - cardRect.left : rect.left - cardRect.left,
             y: rect.top + rect.height / 2 - cardRect.top
