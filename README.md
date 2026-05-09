@@ -4,16 +4,28 @@ I liked the layout of [Inspiration](https://github.com/syssi/esphome-jk-bms/disc
 
 # Layouts
 ## Default
-![balancing.gif](images/balancing.gif)
+![balancing.gif](images/FlowLineUpdated.gif)
+
+**Visual Logic:**
+The flowline animation is exclusive to the Default Layout and triggers dynamically when the balancing current sensor reports a non-zero value. This provides a real-time visual representation of the active balancing process.
+
+***Note on Visualization:***
+*To showcase the flowline animation in the GIF above, the BMS parameters were temporarily adjusted (e.g., `balance starting voltage` at 3.380V and `balance trigger voltage` at 0.003V). These settings ensure the balancing state is active for demonstration purposes.*
+
 
 ## Core Reactor
-![core_reactor.png](images/core_reactor.png)
+![core_reactor2.png](images/core_reactor2.png)
 
 inspired from: https://github.com/syssi/esphome-jk-bms/discussions/230
 integration from: https://github.com/syssi/esphome-jk-bms/tree/main
 
 ## Prefix:
 if your entities start with **jk_bms**_total_voltage, your prefix will be **jk_bms**
+
+## Show / Hide zones:
+![ShowHide.png](images/ShowHide.png)
+
+The control features a highly flexible interface divided into distinct functional zones. Users can toggle the visibility of specific elements — including the Title, Main Content, Cells, Cells Resistance, and other — to create a tailored viewing experience that suits their workflow.
 
 ### Hacs custom repository
 1. Inside hacs, click on the top right burger menu
